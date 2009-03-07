@@ -1,0 +1,28 @@
+******  As of Version 2.1 (February 1, 2009) ******
+
+Bugs in Pinmame that we are aware of:
+-------------------------------------
+(Note: Many of these bugs have been extremely difficult to track down and fix,
+       so it might be awhile before they can be corrected!)
+
+ #1) Williams/Bally WPC: DCS sound still has some problems.
+     (Don't use full volume (29-31) to avoid static noise)
+
+ #2) Not all Williams/Bally WPC functions are implemented in PinMAME.
+     The most important (?!) functions missing are the ticket dispenser,
+     and accurate real time clock emulation (current rtc functionality is a workaround).
+
+ #3) The WPC printer function is only tested with default settings.
+     The printout will probably not work with other settings.
+
+ #4) The name and year for each game were taken from the Internet Pinball Database
+     (http://www.lysator.liu.se/pinball/IPD), and may not be 100% accurate!
+
+ #5) Occasional pops/clicks on Capcom sound
+
+ #6) Data East/Sega/Stern/Gottlieb DMD timing is not 100% accurate.
+
+ #7) Sound gets cut off in Alvin G games sometimes, and some weird notes in World Tour occasionally
+
+ #8) Slugfest will work with "pinmame -cheat sf_l1". Same goes for Theatre Of Magic home version (tom_14h).
+     Alternately, check the "skip pinball startup test" in vpm.

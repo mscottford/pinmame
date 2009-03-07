@@ -1,0 +1,263 @@
+What's new in Visual PinMAME:
+-----------------------------
+
+Version 2.1 (February 1st, 2009)
+--------------------------------
+- No interface changes, refer to whatsnew.txt for PinMAME changes
+
+Version 2.0.1 (August 2nd, 2008)
+--------------------------------
+- Added support for Stern's "Nascar" and "Grand Prix"
+
+Version 2.0 (August 1st, 2008)
+------------------------------
+- Visual PinMAME went open source!
+
+Version 1.60 (April 18th, 2008)
+-------------------------------
+- No interface changes, refer to whatsnew.txt for PinMAME changes
+
+Version 1.59 (February 17th, 2008)
+----------------------------------
+- HSTD displayed in all player panels for GTS1 games
+- Sound support for Zaccaria prototype games (strike, skijump, spacecty)
+
+Version 1.58 (February 1st, 2008)
+--------------------------------
+- Added support for Stern's "The Sopranos"
+- Bios support for gts80, gts80s, gts80a, gts80as
+
+Version 1.57 (December 2nd, 2007)
+--------------------------------
+- Added support for Stern's "Harley Davidson 3rd Edition"
+- Added support for Gottlieb System 1
+- Improved GI Dimming support and NBA Fastbreak Shot Clock
+- Removed need for Early Stern Samples
+- Bios support for gts1, gts1s
+
+Version 1.56 (August 19th, 2007)
+--------------------------------
+- "Bios" support for multiple games running the exact same set of code;
+  for now, there's support for "allied" and "gp_110". (Gerrit Volkenborn)
+- Added support for Stern's "Elvis"
+
+Version 1.55 (March 30th, 2007)
+-------------------------------
+- ChgGI(x, 1) now returns different values for WPC GI string dimming (Steve Ellenoff)
+- Added support for "Ripley's Believe It Or Not!"
+- Happy 6th anniversary VPinMAME!
+
+Version 1.54 (December 23rd, 2006)
+----------------------------------
+- Off-level corrected for display brightness dialog
+- Happy 35th birthday Steve!
+
+Version 1.53, (June 1, 2006)
+----------------------------
+- added display rotation for the vpm window
+- added the code from Jarez Bienz which allows you to set the display dd3 surface
+- fixed a bug in the paths dialog (the first three weren't displayed anymore after a game was started)
+- If you execute Controller.Run without a parent window,
+  VPM will now search for a running VPPlayer-Window and use that if found
+- just before the VPM window becomes visible it is checked if the parent window is present and visible. If it's
+  not visible VPM will wait until it becomse visible (or a timeout of one second times out). Once the
+  parent window is visible it will be set as the active and foreground window
+- selecting the vpm display and pressing escape will cause an error - known issue
+  
+Version 1.52 (August 1th, 2005)
+-------------------------------
+- Added an easter egg screen: THANK YOU GUYS!
+- Controller.Hidden fixed
+
+Version 1.51 (January 11, 2005)
+-------------------------------
+- New properties for the Controller object:
+    - Controller.Game: An abbreviation for Controller.Game(Controller.GameName).
+      It returns the game object for the current game. It's now a bit easier
+      for a script to make game specific settings. You don't have to use the "GameName".
+      Example: Controller.Game.Settings.Value("dmd_pos_x") = 20
+    - Controller.MechSamples(bool): Enables the samples for mechanical devices (flippers, bumpers etc).
+      Sound-board specific samples will still be played (if not disabled by dip switches for the game).
+      This setting is not sticky and will be reset to "false" when a new game name is set.
+      An assignment will only have an effect if done before "Controller.Run".
+- New methods for the controller object:
+    - Controller.GetWindowRect(hWnd): Returns an array of four integer values (0-3)
+      which holds the coordinates (left, top, right, bottom)
+      of the window with the handle 'hWnd' in screen coordinates.
+      If 'hwnd' is absent or an invalid window handle the coordinates of the screen will be returned.
+    - Controller.GetClientRect(hWnd): Returns an array of four integer values (0-3)
+      which holds the client area coordinates (left, top, right, bottom)
+      of the window with the handle 'hWnd' in screen coordinates.
+      If 'hwnd' is absent, or an invalid window handle, the coordinates of the screen will be returned.
+- New method for Game.Settings:
+    - Game.Settings.SetDisplayPosition x, y, hWnd: Moves the display to position (x:y).
+      If "hWnd" is present and a valid window handle, the move is relative to the client position of the window.
+      Otherwise it will be positioned relative to the upper left corner of the screen.
+- Controller.SetDisplayPosition is fixed and works as desired now.
+  Nevertheless, this method is deprecated, so please use the function as described above!
+- The display window can be moved to every x position by now (not just to multiples of 16 pixels as before)
+- While moving the display, it made short jumps if the title and/or the border was visible; this bug is gone now.
+- Changed the warning message on the "Game Info" dialog:
+  When starting a game, the sound processor(s) will be disabled if a sound rom is missing;
+  the new warning message will reflect this behaviour.
+- Switching from full-screen mode back to windowed mode (Alt+Enter) will restore the desktop background.
+- Improved initializing of the VPM display:
+  It will always become visible at the right position, and will always be the topmost window
+- If a valid handle to the "parent" window is added to Controller.Run,
+  this window will be set to the foreground on VPM startup
+
+Version 1.50 (November 1, 2004)
+-------------------------------
+- Updated Visual PinMAME to 1.50 release of PinMAME Source Code.
+- Please see "whatsnew.txt" for PinMAME version 1.50 enhancements!
+- It's now possible to run sets with missing roms as well, just as if you were running PinMAME.
+  Note this will *not* work on newer Stern games which have been released in the last 3 years!
+
+Version 1.32 (May 1, 2004)
+--------------------------
+- Updated Visual PinMAME to 1.32 release of PinMAME Source Code.
+- the controller dislay will be moved to position where it is fully visible after a game was started
+  (prevent not visible controller windows after a game has set the location to a position out of the desktop)
+- added Controller.Hidden (bool) property to hide the controller window. The value is not persitent, hence
+  will not stored in the registry and resets to 'visible' on every call to Controller.GameName (set only)
+
+Version 1.30 (October 1, 2003)
+-----------------------------
+- Fixed the bug in the VPM-Setup-Program where the "Test" feature crashed under w9x
+- Default synclevel is now 0 since many people are getting newer faster computers.
+- Rom Aliasing: Older romset names will internally be converted to new romset names for backward compatibility
+
+Version 1.21 (March 31, 2003)
+-------------------------------------
+The most prominent feature this time should be Tom's "SyncLevel"(TM),
+which is a most delicate and interesting way of synchronizing two separate
+Windows applications from one thread only!
+In other words: Visual PinMAME decides how fast any other application
+running in the same graphical environment will update its view...
+need I say more?
+
+- Added "SyncLevel" feature:
+  'Controller.Games(Controller.GameName).Settings.Value("synclevel")'
+  This will help to keep the Emulation in sync with any other thread
+  running at the same time (like your favorite Pinball simulation software) ;)
+  This should boost game performance even on lower-end PCs...
+- went back to the orange display color everybody loved so much
+
+Version 1.20 Alpha (August 24, 2002)
+-------------------------------------
+- switched to link zlib 1.1.4 instead of 1.1.3
+- changed to use the mame .59 core and most of the mamew code (with some slight modifications)
+  ("Not an ordinary change, but an ordinary bunch of work")
+- added the 'Controller.ChangedLEDs' property
+- added 'Game.Settings' property including the "settings"-object you receive
+- added 'Controller.Settings property including the "settings"-object you receive
+- by using Controller.Settings and Game.Settings access to nearly all MAME settings is available
+  ('Settings.Value("name")=value' 
+- the emulation thread is running at a slightly higher system priority now
+- the display can be resized to every size you like
+
+Version 1.12.1 (April 14, 2002)
+-------------------------------
+- Nothing, the interface works fine
+
+Version 1.12 (March 29, 2002)
+-----------------------------
+- Updated Visual PinMAME to 1.12 release of PinMAME Source Code.
+- Added IObjectSafety interface (VPinMAME now states that it's "safe for scripting")
+- Added a class to created customizable dialogs from the script
+- The Splash dialog will now cycle through 4 different images. A big "thank you" to:
+    Steve Ellenoff (who else?), Stein (winner of the contest), and Forchia (Tomaso Forchiassin)
+    for the images
+- The vpinmame.dll is now compiled using the MS C++ compiler v13.0 (VS.NET)
+
+Version 1.11 (February 3, 2002)
+-------------------------------
+- Updated Visual PinMAME to 1.11 release of PinMAME Source Code.
+- Removed the need for the zlib.dll
+- Added Controller.Games property which enables you to get much more information about the supported games
+  and also enables you to make a more detailed rom check
+- Updated Installer program to use the new .games property to display enhanced game informations
+
+Version 1.10 (December 23, 2001)
+---------------------------------------
+-Updated Visual PinMAME to 1.10 release of PinMAME Source Code.
+-Updated Installer program with new TEST feature built in.
+-Removed VPinMAMETest.exe, use the new TEST feature of the Installer (Setup.exe) instead.
+-Updated the Installation Guide to illustrate new TEST feature.
+
+Version 1.0 Beta 2 (September 28, 2001)
+---------------------------------------
+-Updated Visual PinMAME to 1.0 Beta 2 release of PinMAME Source Code.
+-Removed need to have MSSTDFMT.DLL for VPinMAMETest.exe to work!!
+-Improved Rom Checking Dialogue, now displays the type of rom (CPU or SOUND).
+-Games can now be played even if the sound roms are missing.
+-Added warning message for games that have Imperfect, but emulated sound (Centaur is an example)
+-New interface function .Mech() which allows users to create mech handlers from script.
+-New interface function .NewSoundsCommands() which allows users to track sound commands and play external sound files from the script.
+-Added protection so that newest Stern games (currently Only Austin Powers) cannot be played, to avoid any issues from Stern.
+
+
+Version 1.0 Beta 1 (July 31, 2001)
+------------------------------------
+-Updated Visual PinMAME to 1.0 Beta 1 release of PinMAME Source Code
+-Errors reading zipped roms(wrong compression for example), are now reported to user.
+-Corrected occasional problems when dragging window with mouse.
+-New Compact DMD Option added to Game Options
+-New Double Size DMD Option added to Game Options
+
+
+-New Anti-Alias % DMD Option added to Game Options (only works for Williams WPC games)
+-New HTML Installation Guide included with distribution.
+-Microsoft MSSTDFMT package included with distribution for users missing this file.
+
+
+Version 0.99 Beta 3 (May 04, 2001)
+------------------------------------
+-Updated Visual PinMAME to 0.99 Beta 3 release of PinMAME Source Code
+-Updated installer, now v1.02
+-New Right Mouse Click, Context/Drop Down Menu, for selecting options and window settings
+-New Left Mouse Click & Drag the window to reposition it.
+-New Version Property to allow scripts to check for a minimum Version #.
+-Fixed Display Bug with games using a very wide display layout, such as Harley Davidson
+-Fixed Crashes on games that failed the CRC Check
+-Fixed Initial path information showing in the old 8.3 format instead of long filenames
+
+
+Version 0.99 Beta 2 Rev A (April 23, 2001)
+------------------------------------------
+-Adjusted ROM Mismatch dialog to allow user to try and load roms that are reported as incorrect.
+-Improved Installer/Setup program to identify which version is being installed.
+
+Version 0.99 Beta 2 (April 22, 2001)
+------------------------------------
+-Updated Visual PinMAME to 0.99 Beta 2 release of PinMAME Source Code
+-New Visual PinMAME Setup/Installtion Program
+-New Dialog for troubleshooting missing roms and bad configurations
+-Rom + Configuation Paths only need to be set once, rather than for each individual rom.
+-New Interface Web Page for easier reading of the interface properties!
+-Many New Interface properties for controlling Visual PinMAME: 
+  (See interface.html for more info)
+  Controller.GetMech
+  Controller.SampleRate
+  Controller.ShowFrame
+  Controller.BorderSizeX / Controller.BorderSizeY
+  Controller.WindowPosX / Controller.WindowPosY
+  Controller.DoubleSize
+  Controller.SetDisplayPosition
+  Controller.LockDisplay
+  Controller.Antialias
+  Controller.CheckROMS
+
+-Updated test program to show off some of the new interface features
+-F12 Screenshot functionality added.
+-New configuration directory for screenshots.
+-Controller.Switches() bug fixed.. now returns true/false properly.
+
+
+Version 0.99 Beta 1 (March 31, 2001)
+------------------------------------
+-Updated Visual PinMAME to 0.99 Beta 1 release of PinMAME Source Code
+
+Version 0.99 Beta (March 30, 2001)
+----------------------------------
+- Welcome to the first official release of Visual PinMAME!
