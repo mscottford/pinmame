@@ -16,7 +16,6 @@
 #include "mamedbg.h"
 
 
-
 /*************************************
  *
  *	Include headers from all CPUs
@@ -822,7 +821,10 @@ static int cpu_context_stack_ptr;
  *
  *************************************/
 
-INLINE void set_cpu_context(int cpunum)
+#ifndef __cplusplus
+INLINE 
+#endif
+void set_cpu_context(int cpunum)
 {
 	int newfamily = cpu[cpunum].family;
 	int oldcontext = cpu_active_context[newfamily];

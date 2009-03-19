@@ -115,8 +115,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;C:\Program Files\Microsoft DirectX SDK (August 2007)\Include&quot;;src;src\wpc;src\windows;src\vc;src\zlib;src\htmlhelp\include"
-				PreprocessorDefinitions="WIN32;NDEBUG"
+				AdditionalIncludeDirectories="&quot;C:\Program Files\Microsoft DirectX SDK (August 2007)\Include&quot;;..\src;..\src\wpc;..\src\windows;..\src\vc;..\src\zlib;..\src\htmlhelp\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -200,6 +200,14 @@
 			>
 			<File
 				RelativePath=".\AssemblyInfo.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\cpuintrf.c"
+				>
+			</File>
+			<File
+				RelativePath="..\src\memory.c"
 				>
 			</File>
 			<File

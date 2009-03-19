@@ -135,6 +135,7 @@
 #endif
 
 #define INLINE static __inline
+
 #pragma warning(disable:4018)		// "signed/unsigned mismatch"
 #pragma warning(disable:4146)		// "unary minus operator applied to unsigned type"
 #pragma warning(disable:4244)		// "possible loss of data"

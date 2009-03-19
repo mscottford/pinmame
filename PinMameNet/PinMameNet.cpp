@@ -3,6 +3,11 @@
 #include "stdafx.h"
 #include "Form1.h"
 
+#include "driver.h"
+#include "window.h"
+#include "input.h"
+#include "config.h"
+
 using namespace PinMameNet;
 
 [STAThreadAttribute]

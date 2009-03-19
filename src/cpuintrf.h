@@ -820,7 +820,12 @@ void cpu_set_m68k_reset(int cpunum, void (*resetfn)(void));
  *************************************/
 
 /* return a pointer to the interface struct for a given CPU type */
-INLINE const struct cpu_interface *cputype_get_interface(int cputype)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+const struct cpu_interface *cputype_get_interface(int cputype)
 {
 	extern const struct cpu_interface cpuintrf[];
 	return &cpuintrf[cputype];
@@ -828,7 +833,12 @@ INLINE const struct cpu_interface *cputype_get_interface(int cputype)
 
 
 /* return a the index of the active CPU */
-INLINE int cpu_getactivecpu(void)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+int cpu_getactivecpu(void)
 {
 	extern int activecpu;
 	return activecpu;
@@ -836,7 +846,12 @@ INLINE int cpu_getactivecpu(void)
 
 
 /* return a the index of the executing CPU */
-INLINE int cpu_getexecutingcpu(void)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+int cpu_getexecutingcpu(void)
 {
 	extern int executingcpu;
 	return executingcpu;
@@ -844,7 +859,12 @@ INLINE int cpu_getexecutingcpu(void)
 
 
 /* return a the total number of registered CPUs */
-INLINE int cpu_gettotalcpu(void)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+int cpu_gettotalcpu(void)
 {
 	extern int totalcpu;
 	return totalcpu;
