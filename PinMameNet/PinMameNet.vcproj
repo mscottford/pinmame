@@ -136,7 +136,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="$(NoInherit)"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;C:\Program Files\Microsoft DirectX SDK (August 2007)\Lib\x86&quot;;zlib;src\htmlhelp\lib"
+				AdditionalLibraryDirectories="&quot;C:\Program Files\Microsoft DirectX SDK (August 2007)\Lib\x86&quot;;..\zlib;..\src\htmlhelp\lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				EntryPointSymbol="main"
@@ -203,7 +203,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\common.c"
+				>
+			</File>
+			<File
 				RelativePath="..\src\cpuintrf.c"
+				>
+			</File>
+			<File
+				RelativePath="..\src\cpuintrf.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\fileio.c"
 				>
 			</File>
 			<File
@@ -212,6 +224,10 @@
 			</File>
 			<File
 				RelativePath=".\PinMameNet.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\state.c"
 				>
 			</File>
 			<File
@@ -234,6 +250,22 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath="..\src\usrintrf.c"
+				>
+			</File>
+			<Filter
+				Name="zlib"
+				>
+				<File
+					RelativePath="..\src\zlib\zconf.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\zlib\zlib.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"

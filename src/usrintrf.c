@@ -254,7 +254,12 @@ static const struct GfxLayout uifontlayout =
 	ui_markdirty - mark a raw rectangle dirty
 -------------------------------------------------*/
 
-INLINE void ui_markdirty(const struct rectangle *rect)
+#ifndef __cplusplus
+INLINE 
+#else
+static
+#endif
+void ui_markdirty(const struct rectangle *rect)
 {
 	artwork_mark_ui_dirty(rect->min_x, rect->min_y, rect->max_x, rect->max_y);
 	ui_dirty = 5;
@@ -578,7 +583,7 @@ static unsigned multiline_extract(const char **pbegin, const char *end, unsigned
 				++word_end;
 
 			/* if that pushes us past the max, truncate here */
-			if (numchars + word_end - begin > maxchars)
+			if ((unsigned int) (numchars + word_end - begin) > maxchars)
 			{
 				/* if we have at least one character, strip the space */
 				if (numchars)
@@ -1233,7 +1238,7 @@ static void showcharset(struct mame_bitmap *bitmap)
 					erase_screen(bitmap);
 
 					/* validity check after char bank change */
-					if (firstdrawn >= Machine->gfx[bank]->total_elements)
+					if ((UINT32) firstdrawn >= Machine->gfx[bank]->total_elements)
 					{
 						firstdrawn = Machine->gfx[bank]->total_elements - skip_chars;
 						if (firstdrawn < 0) firstdrawn = 0;
@@ -1242,7 +1247,7 @@ static void showcharset(struct mame_bitmap *bitmap)
 					flipx = 0;
 					flipy = 0;
 
-					for (i = 0; i+firstdrawn < Machine->gfx[bank]->total_elements && i<cpx*cpy; i++)
+					for (i = 0; (UINT32) (i+firstdrawn) < Machine->gfx[bank]->total_elements && i<cpx*cpy; i++)
 					{
 						struct rectangle bounds;
 						bounds.min_x = (i % cpx) * crotwidth + uirotbounds.min_x;
@@ -1398,7 +1403,7 @@ static void showcharset(struct mame_bitmap *bitmap)
 				}
 				case 1:
 				{
-					if (firstdrawn + skip_chars < Machine->gfx[bank]->total_elements)
+					if ((UINT32) (firstdrawn + skip_chars) < Machine->gfx[bank]->total_elements)
 					{
 						firstdrawn += skip_chars;
 						changed = 1;
@@ -1487,7 +1492,7 @@ static void showcharset(struct mame_bitmap *bitmap)
 			{
 				case 1:
 				{
-					if (color < Machine->gfx[bank]->total_colors - 1)
+					if ((UINT32) color < Machine->gfx[bank]->total_colors - 1)
 					{
 						color++;
 						changed = 1;
@@ -2841,7 +2846,7 @@ static int displayhistory (struct mame_bitmap *bitmap, int selected)
 	if (!buf)
 	{
 		/* allocate a buffer for the text */
-		buf = malloc (bufsize);
+		buf = (char*) malloc (bufsize);
 
 		if (buf)
 		{
@@ -3513,7 +3518,7 @@ static void onscrd_mixervol(struct mame_bitmap *bitmap,int increment,int arg)
 			{
 				if (mixer_get_name(ch) != 0)
 				{
-					volume = ratio * old_vol[ch];
+					volume = (int) (ratio * old_vol[ch]);
 					if (volume < 0 || volume > 100)
 						overflow = 1;
 				}
@@ -3523,7 +3528,7 @@ static void onscrd_mixervol(struct mame_bitmap *bitmap,int increment,int arg)
 			{
 				for (ch = 0; ch < MIXER_MAX_CHANNELS; ch++)
 				{
-					volume = ratio * old_vol[ch];
+					volume = (int) (ratio * old_vol[ch]);
 					mixer_set_mixing_level(ch,volume);
 				}
 			}
@@ -3574,7 +3579,7 @@ static void onscrd_brightness(struct mame_bitmap *bitmap,int increment,int arg)
 	brightness = palette_get_global_brightness();
 
 	sprintf(buf,"%s %3d%%", ui_getstring (UI_brightness), (int)(brightness * 100));
-	displayosd(bitmap,buf,brightness*100,100);
+	displayosd(bitmap,buf,(int) (brightness*100),100);
 }
 
 static void onscrd_gamma(struct mame_bitmap *bitmap,int increment,int arg)
@@ -3595,7 +3600,7 @@ static void onscrd_gamma(struct mame_bitmap *bitmap,int increment,int arg)
 	gamma_correction = palette_get_global_gamma();
 
 	sprintf(buf,"%s %1.2f", ui_getstring (UI_gamma), gamma_correction);
-	displayosd(bitmap,buf,100*(gamma_correction-0.5)/(2.0-0.5),100*(1.0-0.5)/(2.0-0.5));
+	displayosd(bitmap,buf,(int) (100*(gamma_correction-0.5)/(2.0-0.5)),(int) (100*(1.0-0.5)/(2.0-0.5)));
 }
 
 static void onscrd_vector_flicker(struct mame_bitmap *bitmap,int increment,int arg)
@@ -3619,7 +3624,7 @@ static void onscrd_vector_flicker(struct mame_bitmap *bitmap,int increment,int a
 	flicker_correction = vector_get_flicker();
 
 	sprintf(buf,"%s %1.2f", ui_getstring (UI_vectorflicker), flicker_correction);
-	displayosd(bitmap,buf,flicker_correction,0);
+	displayosd(bitmap,buf,(int) flicker_correction,0);
 }
 
 static void onscrd_vector_intensity(struct mame_bitmap *bitmap,int increment,int arg)
@@ -3631,7 +3636,7 @@ static void onscrd_vector_intensity(struct mame_bitmap *bitmap,int increment,int
 	{
 		intensity_correction = vector_get_intensity();
 
-		intensity_correction += 0.05 * increment;
+		intensity_correction += (float) (0.05 * increment);
 		if (intensity_correction < 0.5) intensity_correction = 0.5;
 		if (intensity_correction > 3.0) intensity_correction = 3.0;
 
@@ -3640,7 +3645,7 @@ static void onscrd_vector_intensity(struct mame_bitmap *bitmap,int increment,int
 	intensity_correction = vector_get_intensity();
 
 	sprintf(buf,"%s %1.2f", ui_getstring (UI_vectorintensity), intensity_correction);
-	displayosd(bitmap,buf,100*(intensity_correction-0.5)/(3.0-0.5),100*(1.5-0.5)/(3.0-0.5));
+	displayosd(bitmap,buf,(int) (100*(intensity_correction-0.5)/(3.0-0.5)), (int) (100*(1.5-0.5)/(3.0-0.5)));
 }
 
 
@@ -3667,7 +3672,7 @@ static void onscrd_overclock(struct mame_bitmap *bitmap,int increment,int arg)
 			timer_set_overclock(arg, overclock);
 	}
 
-	oc = 100 * timer_get_overclock(arg) + 0.5;
+	oc = (int) (100 * timer_get_overclock(arg) + 0.5);
 
 	if( doallcpus )
 		sprintf(buf,"%s %s %3d%%", ui_getstring (UI_allcpus), ui_getstring (UI_overclock), oc);

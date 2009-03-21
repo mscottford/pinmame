@@ -329,7 +329,7 @@ UINT32 mame_fread(mame_file *file, void *buffer, UINT32 length)
 			{
 				if (file->offset + length > file->length)
 				{
-					length = file->length - file->offset;
+					length = (UINT32) (file->length - file->offset);
 					file->eof = 1;
 				}
 				memcpy(buffer, file->data + file->offset, length);
@@ -417,7 +417,7 @@ int mame_fchecksum(const char *gamename, const char *filename, unsigned int *len
 
 	/* close the file and save the length & checksum */
 	hash_data_copy(hash, file->hash);
-	*length = file->length;
+	*length = (unsigned int) file->length;
 	mame_fclose(file);
 	return 0;
 }
@@ -436,9 +436,9 @@ UINT64 mame_fsize(mame_file *file)
 		case PLAIN_FILE:
 		{
 			int size, offs;
-			offs = osd_ftell(file->file);
+			offs = (int) osd_ftell(file->file);
 			osd_fseek(file->file, 0, SEEK_END);
-			size = osd_ftell(file->file);
+			size = (int) osd_ftell(file->file);
 			osd_fseek(file->file, offs, SEEK_SET);
 			return size;
 		}
@@ -640,7 +640,7 @@ UINT32 mame_fread_swap(mame_file *file, void *buffer, UINT32 length)
 	res = mame_fread(file, buffer, length);
 
 	/* swap the result */
-	buf = buffer;
+	buf = (UINT8*) buffer;
 	for (i = 0; i < res; i += 2)
 	{
 		temp = buf[i];
@@ -665,7 +665,7 @@ UINT32 mame_fwrite_swap(mame_file *file, const void *buffer, UINT32 length)
 
 	/* swap the data first */
 	buf = (UINT8 *)buffer;
-	for (i = 0; i < length; i += 2)
+	for (i = 0; (UINT32) i < length; i += 2)
 	{
 		temp = buf[i];
 		buf[i] = buf[i + 1];
@@ -676,7 +676,7 @@ UINT32 mame_fwrite_swap(mame_file *file, const void *buffer, UINT32 length)
 	res = mame_fwrite(file, buffer, length);
 
 	/* swap the data back */
-	for (i = 0; i < length; i += 2)
+	for (i = 0; (UINT32) i < length; i += 2)
 	{
 		temp = buf[i];
 		buf[i] = buf[i + 1];
@@ -691,8 +691,12 @@ UINT32 mame_fwrite_swap(mame_file *file, const void *buffer, UINT32 length)
 /***************************************************************************
 	compose_path
 ***************************************************************************/
-
-INLINE void compose_path(char *output, const char *gamename, const char *filename, const char *extension)
+#ifndef __cplusplus
+INLINE 
+#else
+static
+#endif
+void compose_path(char *output, const char *gamename, const char *filename, const char *extension)
 {
 	char *filename_base = output;
 	*output = 0;
@@ -968,7 +972,7 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 						if (options.crc_only && (functions & HASH_CRC))
 							functions = HASH_CRC;
 
-						hash_compute(file.hash, file.data, file.length, functions);
+						hash_compute(file.hash, file.data, (unsigned long) file.length, functions);
 						break;
 					}
 				}
@@ -981,7 +985,7 @@ static mame_file *generic_fopen(int pathtype, const char *gamename, const char *
 		return NULL;
 
 	/* otherwise, duplicate the file */
-	newfile = malloc(sizeof(file));
+	newfile = (mame_file*) malloc(sizeof(file));
 	if (newfile)
 	{
 		*newfile = file;
@@ -1026,7 +1030,7 @@ static int checksum_file(int pathtype, int pathindex, const char *file, UINT8 **
 	}
 
 	/* allocate space for entire file */
-	data = malloc(length);
+	data = (UINT8*) malloc((size_t) length);
 	if (!data)
 	{
 		osd_fclose(f);
@@ -1041,7 +1045,7 @@ static int checksum_file(int pathtype, int pathindex, const char *file, UINT8 **
 		return -1;
 	}
 
-	if (osd_fread(f, data, length) != length)
+	if (osd_fread(f, data, (UINT32) length) != length)
 	{
 		free(data);
 		osd_fclose(f);
@@ -1055,7 +1059,7 @@ static int checksum_file(int pathtype, int pathindex, const char *file, UINT8 **
 	functions = hash_data_used_functions(hash);
 	if (options.crc_only && (functions & HASH_CRC))
 		functions = HASH_CRC;
-	hash_compute(hash, data, length, functions);
+	hash_compute(hash, data, (unsigned long) length, functions);
 
 	/* if the caller wants the data, give it away, otherwise free it */
 	if (p)
