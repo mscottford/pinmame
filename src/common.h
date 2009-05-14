@@ -415,12 +415,7 @@ void bitmap_free(struct mame_bitmap *bitmap);
 /* automatic resource management */
 void begin_resource_tracking(void);
 void end_resource_tracking(void);
-#ifndef __cplusplus
-INLINE
-#else
-static
-#endif
-int get_resource_tag(void)
+INLINE int get_resource_tag(void)
 {
 	extern int resource_tracking_tag;
 	return resource_tracking_tag;

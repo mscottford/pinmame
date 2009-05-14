@@ -922,22 +922,12 @@ data32_t	cpu_readop_arg32_safe(offs_t offset);
 
 /* ----- opcode and opcode argument reading ----- */
 void activecpu_set_op_base(unsigned val);
-
-#ifndef __cplusplus
 INLINE data8_t  cpu_readop(offs_t A)		{ if (address_is_unsafe(A)) { activecpu_set_op_base(A); } return cpu_readop_unsafe(A); }
 INLINE data16_t cpu_readop16(offs_t A)		{ if (address_is_unsafe(A)) { activecpu_set_op_base(A); } return cpu_readop16_unsafe(A); }
 INLINE data32_t cpu_readop32(offs_t A)		{ if (address_is_unsafe(A)) { activecpu_set_op_base(A); } return cpu_readop32_unsafe(A); }
 INLINE data8_t  cpu_readop_arg(offs_t A)	{ if (address_is_unsafe(A)) { activecpu_set_op_base(A); } return cpu_readop_arg_unsafe(A); }
 INLINE data16_t cpu_readop_arg16(offs_t A)	{ if (address_is_unsafe(A)) { activecpu_set_op_base(A); } return cpu_readop_arg16_unsafe(A); }
 INLINE data32_t cpu_readop_arg32(offs_t A)	{ if (address_is_unsafe(A)) { activecpu_set_op_base(A); } return cpu_readop_arg32_unsafe(A); }
-#else
-static data8_t  cpu_readop(offs_t A)		{ if (address_is_unsafe(A)) { activecpu_set_op_base(A); } return cpu_readop_unsafe(A); }
-static data16_t cpu_readop16(offs_t A)		{ if (address_is_unsafe(A)) { activecpu_set_op_base(A); } return cpu_readop16_unsafe(A); }
-static data32_t cpu_readop32(offs_t A)		{ if (address_is_unsafe(A)) { activecpu_set_op_base(A); } return cpu_readop32_unsafe(A); }
-static data8_t  cpu_readop_arg(offs_t A)	{ if (address_is_unsafe(A)) { activecpu_set_op_base(A); } return cpu_readop_arg_unsafe(A); }
-static data16_t cpu_readop_arg16(offs_t A)	{ if (address_is_unsafe(A)) { activecpu_set_op_base(A); } return cpu_readop_arg16_unsafe(A); }
-static data32_t cpu_readop_arg32(offs_t A)	{ if (address_is_unsafe(A)) { activecpu_set_op_base(A); } return cpu_readop_arg32_unsafe(A); }
-#endif
 
 /* ----- bank switching for CPU cores ----- */
 #define change_pc_generic(pc,abits,minbits,setop)										\

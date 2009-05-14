@@ -320,7 +320,7 @@ void memory_set_opcode_base(int cpunum, void *base)
 {
 	if (cur_context == cpunum)
 	{
-		OP_ROM = (UINT8*) base;
+		OP_ROM = base;
 		OP_MEM_MIN = (offs_t) 0x00000000;
 		OP_MEM_MAX = (offs_t) 0x7fffffff;
 	}
