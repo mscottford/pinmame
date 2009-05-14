@@ -357,9 +357,9 @@ void memory_set_context(int activecpu)
 	}
 	cur_context = activecpu;
 
-	cpu_bankbase[STATIC_RAM] = (UINT8*) cpudata[activecpu].rambase;
-	OP_RAM = (UINT8*) cpudata[activecpu].op_ram;
-	OP_ROM = (UINT8*) cpudata[activecpu].op_rom;
+	cpu_bankbase[STATIC_RAM] = cpudata[activecpu].rambase;
+	OP_RAM = cpudata[activecpu].op_ram;
+	OP_ROM = cpudata[activecpu].op_rom;
 	OP_MEM_MIN = cpudata[activecpu].op_mem_min;
 	OP_MEM_MAX = cpudata[activecpu].op_mem_max;
 	opcode_entry = opcode_entry;
@@ -466,7 +466,7 @@ data8_t *install_mem_read_handler(int cpunum, offs_t start, offs_t end, mem_read
 	/* dump the new memory configuration */
 	mem_dump();
 #endif
-	return (UINT8*) memory_find_base(cpunum, start);
+	return memory_find_base(cpunum, start);
 }
 
 
@@ -490,7 +490,7 @@ data16_t *install_mem_read16_handler(int cpunum, offs_t start, offs_t end, mem_r
 	/* dump the new memory configuration */
 	mem_dump();
 #endif
-	return (data16_t*) memory_find_base(cpunum, start);
+	return memory_find_base(cpunum, start);
 }
 
 
@@ -514,7 +514,7 @@ data32_t *install_mem_read32_handler(int cpunum, offs_t start, offs_t end, mem_r
 	/* dump the new memory configuration */
 	mem_dump();
 #endif
-	return (data32_t*) memory_find_base(cpunum, start);
+	return memory_find_base(cpunum, start);
 }
 
 
@@ -538,7 +538,7 @@ data8_t *install_mem_write_handler(int cpunum, offs_t start, offs_t end, mem_wri
 	/* dump the new memory configuration */
 	mem_dump();
 #endif
-	return (data8_t*) memory_find_base(cpunum, start);
+	return memory_find_base(cpunum, start);
 }
 
 
@@ -562,7 +562,7 @@ data16_t *install_mem_write16_handler(int cpunum, offs_t start, offs_t end, mem_
 	/* dump the new memory configuration */
 	mem_dump();
 #endif
-	return (data16_t*) memory_find_base(cpunum, start);
+	return memory_find_base(cpunum, start);
 }
 
 
@@ -586,7 +586,7 @@ data32_t *install_mem_write32_handler(int cpunum, offs_t start, offs_t end, mem_
 	/* dump the new memory configuration */
 	mem_dump();
 #endif
-	return (data32_t*) memory_find_base(cpunum, start);
+	return memory_find_base(cpunum, start);
 }
 
 
@@ -871,7 +871,7 @@ UINT8 alloc_new_subtable(const struct memport_data *memport, struct table_data *
 	if (tabledata->subtable_count <= tabledata->subtable_alloc)
 	{
 		tabledata->subtable_alloc += SUBTABLE_ALLOC;
-		tabledata->table = (UINT8*) realloc(tabledata->table, (1 << l1bits) + (tabledata->subtable_alloc << l2bits));
+		tabledata->table = realloc(tabledata->table, (1 << l1bits) + (tabledata->subtable_alloc << l2bits));
 		if (!tabledata->table)
 			fatalerror("error: ran out of memory allocating memory subtable\n");
 	}
@@ -1023,7 +1023,7 @@ void install_mem_handler(struct memport_data *memport, int iswrite, offs_t start
 	/* if this is a bank, set the bankbase as well */
 	if (HANDLER_IS_BANK(handler))
 	{
-		cpu_bankbase[HANDLER_TO_BANK(handler)] = (UINT8*) memory_find_base(memport->cpunum, start);
+		cpu_bankbase[HANDLER_TO_BANK(handler)] = memory_find_base(memport->cpunum, start);
 #ifdef PINMAME
 /* Bank support for CODELIST */
 		cpu_bankid[HANDLER_TO_BANK(handler)] = FAKE_BANKID;
@@ -1147,8 +1147,8 @@ static int init_memport(int cpunum, struct memport_data *data, int abits, int db
 	data->mask = 0xffffffffUL >> (32 - abits);
 
 	/* allocate memory */
-	data->read.table = (UINT8*) malloc(1 << LEVEL1_BITS(data->ebits));
-	data->write.table = (UINT8*) malloc(1 << LEVEL1_BITS(data->ebits));
+	data->read.table = malloc(1 << LEVEL1_BITS(data->ebits));
+	data->write.table = malloc(1 << LEVEL1_BITS(data->ebits));
 	if (!data->read.table)
 		return fatalerror("cpu #%d couldn't allocate read table\n", cpunum);
 	if (!data->write.table)
@@ -1188,8 +1188,8 @@ static int verify_memory(void)
 	/* loop over CPUs */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
-		const struct Memory_ReadAddress *mra = (const struct Memory_ReadAddress*) Machine->drv->cpu[cpunum].memory_read;
-		const struct Memory_WriteAddress *mwa = (const struct Memory_WriteAddress*) Machine->drv->cpu[cpunum].memory_write;
+		const struct Memory_ReadAddress *mra = Machine->drv->cpu[cpunum].memory_read;
+		const struct Memory_WriteAddress *mwa = Machine->drv->cpu[cpunum].memory_write;
 		UINT32 width;
 		int bank;
 
@@ -1268,8 +1268,8 @@ static int verify_ports(void)
 	/* loop over CPUs */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
-		const struct IO_ReadPort *mra = (const struct IO_ReadPort*) Machine->drv->cpu[cpunum].port_read;
-		const struct IO_WritePort *mwa = (const struct IO_WritePort*) Machine->drv->cpu[cpunum].port_write;
+		const struct IO_ReadPort *mra = Machine->drv->cpu[cpunum].port_read;
+		const struct IO_WritePort *mwa = Machine->drv->cpu[cpunum].port_write;
 		UINT32 width;
 
 		/* determine the desired width */
@@ -1362,19 +1362,19 @@ static int allocate_memory(void)
 		/* keep going until we break out */
 		while (1)
 		{
-			const struct Memory_ReadAddress *mra = (const struct Memory_ReadAddress*) Machine->drv->cpu[cpunum].memory_read;
-			const struct Memory_WriteAddress *mwa = (const struct Memory_WriteAddress*) Machine->drv->cpu[cpunum].memory_write;
+			const struct Memory_ReadAddress *mra = Machine->drv->cpu[cpunum].memory_read;
+			const struct Memory_WriteAddress *mwa = Machine->drv->cpu[cpunum].memory_write;
 			offs_t lowest = ~0, end, lastend;
 
 			/* find the base of the lowest memory region that extends past the end */
-			for (mra = (const struct Memory_ReadAddress*) Machine->drv->cpu[cpunum].memory_read; !IS_MEMPORT_END(mra); mra++)
+			for (mra = Machine->drv->cpu[cpunum].memory_read; !IS_MEMPORT_END(mra); mra++)
 				if (!IS_MEMPORT_MARKER(mra))
-					if (mra->end >= (offs_t) size && mra->start < lowest && needs_ram(cpunum, (void *)mra->handler))
+					if (mra->end >= size && mra->start < lowest && needs_ram(cpunum, (void *)mra->handler))
 						lowest = mra->start;
 
-			for (mwa = (const struct Memory_WriteAddress*) Machine->drv->cpu[cpunum].memory_write; !IS_MEMPORT_END(mwa); mwa++)
+			for (mwa = Machine->drv->cpu[cpunum].memory_write; !IS_MEMPORT_END(mwa); mwa++)
 				if (!IS_MEMPORT_MARKER(mwa))
-					if (mwa->end >= (offs_t) size && mwa->start < lowest && (mwa->base || needs_ram(cpunum, (void *)mwa->handler)))
+					if (mwa->end >= size && mwa->start < lowest && (mwa->base || needs_ram(cpunum, (void *)mwa->handler)))
 						lowest = mwa->start;
 
 			/* done if nothing found */
@@ -1389,12 +1389,12 @@ static int allocate_memory(void)
 				lastend = end;
 
 				/* find the end of the contiguous block of memory */
-				for (mra = (const struct Memory_ReadAddress*) Machine->drv->cpu[cpunum].memory_read; !IS_MEMPORT_END(mra); mra++)
+				for (mra = Machine->drv->cpu[cpunum].memory_read; !IS_MEMPORT_END(mra); mra++)
 					if (!IS_MEMPORT_MARKER(mra))
 						if (mra->start <= end+1 && mra->end > end && needs_ram(cpunum, (void *)mra->handler))
 							end = mra->end;
 
-				for (mwa = (const struct Memory_WriteAddress*) Machine->drv->cpu[cpunum].memory_write; !IS_MEMPORT_END(mwa); mwa++)
+				for (mwa = Machine->drv->cpu[cpunum].memory_write; !IS_MEMPORT_END(mwa); mwa++)
 					if (!IS_MEMPORT_MARKER(mwa))
 						if (mwa->start <= end+1 && mwa->end > end && (mwa->base || needs_ram(cpunum, (void *)mwa->handler)))
 							end = mwa->end;
@@ -1412,7 +1412,7 @@ static int allocate_memory(void)
 			ext->region = region;
 
 			/* allocate memory */
-			ext->data = (UINT8*) malloc(end+1 - lowest);
+			ext->data = malloc(end+1 - lowest);
 			if (!ext->data)
 				fatalerror("malloc(%d) failed (lowest: %x - end: %x)\n", end + 1 - lowest, lowest, end);
 
@@ -1422,7 +1422,7 @@ static int allocate_memory(void)
 			/* prepare for the next loop */
 			size = ext->end + 1;
 			/* check for wraparound */
-			if ((offs_t) size < ext->end)
+			if (size < ext->end)
 				break;
 
 			ext++;
@@ -1444,8 +1444,8 @@ static int populate_memory(void)
 	/* loop over CPUs */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
-		const struct Memory_ReadAddress *mra, *mra_start = (const struct Memory_ReadAddress*) Machine->drv->cpu[cpunum].memory_read;
-		const struct Memory_WriteAddress *mwa, *mwa_start = (const struct Memory_WriteAddress*) Machine->drv->cpu[cpunum].memory_write;
+		const struct Memory_ReadAddress *mra, *mra_start = Machine->drv->cpu[cpunum].memory_read;
+		const struct Memory_WriteAddress *mwa, *mwa_start = Machine->drv->cpu[cpunum].memory_write;
 
 		/* install the read handlers */
 		if (mra_start)
@@ -1474,7 +1474,7 @@ static int populate_memory(void)
 				if (!IS_MEMPORT_MARKER(mwa))
 				{
 					install_mem_handler(&cpudata[cpunum].mem, 1, mwa->start, mwa->end, (void *)mwa->handler);
-					if (mwa->base) *mwa->base = (data8_t*) memory_find_base(cpunum, mwa->start);
+					if (mwa->base) *mwa->base = memory_find_base(cpunum, mwa->start);
 					if (mwa->size) *mwa->size = mwa->end - mwa->start + 1;
 				}
 		}
@@ -1495,8 +1495,8 @@ static int populate_ports(void)
 	/* loop over CPUs */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
-		const struct IO_ReadPort *mra, *mra_start = (const struct IO_ReadPort*) Machine->drv->cpu[cpunum].port_read;
-		const struct IO_WritePort *mwa, *mwa_start = (const struct IO_WritePort*) Machine->drv->cpu[cpunum].port_write;
+		const struct IO_ReadPort *mra, *mra_start = Machine->drv->cpu[cpunum].port_read;
+		const struct IO_WritePort *mwa, *mwa_start = Machine->drv->cpu[cpunum].port_write;
 
 		/* install the read handlers */
 		if (mra_start)
@@ -1565,7 +1565,7 @@ static void rg_add_entry(UINT32 start, UINT32 end, int mode)
 		int mask;
 		if(!*cur || ((*cur)->start > start))
 		{
-			rg_map_entry *e = (rg_map_entry*) malloc(sizeof(rg_map_entry));
+			rg_map_entry *e = malloc(sizeof(rg_map_entry));
 			e->start = start;
 			e->end = *cur && (*cur)->start <= end ? (*cur)->start - 1 : end;
 			e->flags = mode;
@@ -1580,7 +1580,7 @@ static void rg_add_entry(UINT32 start, UINT32 end, int mode)
 
 		if((*cur)->start < start)
 		{
-			rg_map_entry *e = (rg_map_entry*) malloc(sizeof(rg_map_entry));
+			rg_map_entry *e = malloc(sizeof(rg_map_entry));
 			e->start = (*cur)->start;
 			e->end = start - 1;
 			e->flags = (*cur)->flags;
@@ -1592,7 +1592,7 @@ static void rg_add_entry(UINT32 start, UINT32 end, int mode)
 
 		if((*cur)->end > end)
 		{
-			rg_map_entry *e = (rg_map_entry*) malloc(sizeof(rg_map_entry));
+			rg_map_entry *e = malloc(sizeof(rg_map_entry));
 			e->start = start;
 			e->end = end;
 			e->flags = (*cur)->flags;
@@ -1636,13 +1636,13 @@ static void register_zone(int cpunum, UINT32 start, UINT32 end)
 	switch (cpunum_databus_width(cpunum))
 	{
 	case 8:
-		state_save_register_UINT8 ("memory", cpunum, name, (UINT8*) memory_find_base(cpunum, start), end-start+1);
+		state_save_register_UINT8 ("memory", cpunum, name, memory_find_base(cpunum, start), end-start+1);
 		break;
 	case 16:
-		state_save_register_UINT16("memory", cpunum, name, (UINT16*) memory_find_base(cpunum, start), (end-start+1)/2);
+		state_save_register_UINT16("memory", cpunum, name, memory_find_base(cpunum, start), (end-start+1)/2);
 		break;
 	case 32:
-		state_save_register_UINT32("memory", cpunum, name, (UINT32*) memory_find_base(cpunum, start), (end-start+1)/4);
+		state_save_register_UINT32("memory", cpunum, name, memory_find_base(cpunum, start), (end-start+1)/4);
 		break;
 	}
 }
@@ -1662,15 +1662,15 @@ void register_banks(void)
 	/* loop over CPUs */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
-		const struct Memory_ReadAddress *mra, *mra_start = (const struct Memory_ReadAddress*) Machine->drv->cpu[cpunum].memory_read;
-		const struct Memory_WriteAddress *mwa, *mwa_start = (const struct Memory_WriteAddress*) Machine->drv->cpu[cpunum].memory_write;
+		const struct Memory_ReadAddress *mra, *mra_start = Machine->drv->cpu[cpunum].memory_read;
+		const struct Memory_WriteAddress *mwa, *mwa_start = Machine->drv->cpu[cpunum].memory_write;
 		int bits = cpudata[cpunum].mem.abits;
 //		int width = cpunum_databus_width(cpunum);
 
 		if (!IS_SPARSE(bits))
 		{
 			UINT32 size = memory_region_length(REGION_CPU1 + cpunum);
-			if (size > (UINT32) (1<<bits))
+			if (size > (1<<bits))
 				size = 1 << bits;
 			rg_add_entry(0, size-1, RG_SAVE_READ|RG_SAVE_WRITE);
 		}

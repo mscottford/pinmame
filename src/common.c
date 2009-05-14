@@ -220,7 +220,7 @@ static struct GameSample *read_wav_sample(mame_file *f)
 	}
 
 	/* allocate the game sample */
-	result = (struct GameSample*) auto_malloc(sizeof(struct GameSample) + length);
+	result = auto_malloc(sizeof(struct GameSample) + length);
 	if (result == NULL)
 		return NULL;
 
@@ -276,7 +276,7 @@ struct GameSamples *readsamples(const char **samplenames,const char *basename)
 
 	if (!i) return 0;
 
-	if ((samples = (struct GameSamples*) auto_malloc(sizeof(struct GameSamples) + (i-1)*sizeof(struct GameSample))) == 0)
+	if ((samples = auto_malloc(sizeof(struct GameSamples) + (i-1)*sizeof(struct GameSample))) == 0)
 		return 0;
 
 	samples->total = i;
@@ -376,7 +376,7 @@ int new_memory_region(int num, size_t length, UINT32 flags)
     if (num < MAX_MEMORY_REGIONS)
     {
         Machine->memory_region[num].length = length;
-        Machine->memory_region[num].base = (UINT8*) malloc(length);
+        Machine->memory_region[num].base = malloc(length);
         return (Machine->memory_region[num].base == NULL) ? 1 : 0;
     }
     else
@@ -388,7 +388,7 @@ int new_memory_region(int num, size_t length, UINT32 flags)
                 Machine->memory_region[i].length = length;
                 Machine->memory_region[i].type = num;
                 Machine->memory_region[i].flags = flags;
-                Machine->memory_region[i].base = (UINT8*) malloc(length);
+                Machine->memory_region[i].base = malloc(length);
                 return (Machine->memory_region[i].base == NULL) ? 1 : 0;
             }
         }
@@ -551,7 +551,7 @@ struct mame_bitmap *bitmap_alloc_core(int width,int height,int depth,int use_aut
 	}
 
 	/* allocate memory for the bitmap struct */
-	bitmap = (struct mame_bitmap*) (use_auto ? auto_malloc(sizeof(struct mame_bitmap)) : malloc(sizeof(struct mame_bitmap)));
+	bitmap = use_auto ? auto_malloc(sizeof(struct mame_bitmap)) : malloc(sizeof(struct mame_bitmap));
 	if (bitmap != NULL)
 	{
 		int i, rowlen, rdwidth, bitmapsize, linearraysize, pixelsize;
@@ -583,7 +583,7 @@ struct mame_bitmap *bitmap_alloc_core(int width,int height,int depth,int use_aut
 		linearraysize = (height + 2 * BITMAP_SAFETY) * sizeof(unsigned char *);
 
 		/* allocate the bitmap data plus an array of line pointers */
-		bitmap->line = (void**) (use_auto ? auto_malloc(linearraysize + bitmapsize) : malloc(linearraysize + bitmapsize));
+		bitmap->line = use_auto ? auto_malloc(linearraysize + bitmapsize) : malloc(linearraysize + bitmapsize);
 		if (bitmap->line == NULL)
 		{
 			if (!use_auto) free(bitmap);
@@ -1173,8 +1173,8 @@ static void verify_length_and_hash(struct rom_load_data *romdata, const char *na
 		return;
 
 	/* get the length and CRC from the file */
-	actlength = (UINT32) mame_fsize((mame_file*) romdata->file);
-	acthash = mame_fhash((mame_file*) romdata->file);
+	actlength = mame_fsize(romdata->file);
+	acthash = mame_fhash(romdata->file);
 
 	/* verify length */
 	if (explength != actlength)
@@ -1297,7 +1297,7 @@ static void region_post_process(struct rom_load_data *romdata, const struct RomM
 	if (ROMREGION_ISINVERTED(regiondata))
 	{
 		debugload("+ Inverting region\n");
-		for (i = 0, base = romdata->regionbase; (UINT32) i < romdata->regionlength; i++)
+		for (i = 0, base = romdata->regionbase; i < romdata->regionlength; i++)
 			*base++ ^= 0xff;
 	}
 
@@ -1309,7 +1309,7 @@ static void region_post_process(struct rom_load_data *romdata, const struct RomM
 #endif
 	{
 		debugload("+ Byte swapping region\n");
-		for (i = 0, base = romdata->regionbase; (UINT32) i < romdata->regionlength; i += datawidth)
+		for (i = 0, base = romdata->regionbase; i < romdata->regionlength; i += datawidth)
 		{
 			UINT8 temp[8];
 			memcpy(temp, base, datawidth);
@@ -1356,7 +1356,7 @@ static int rom_fread(struct rom_load_data *romdata, UINT8 *buffer, int length)
 {
 	/* files just pass through */
 	if (romdata->file)
-		return mame_fread((mame_file*) romdata->file, buffer, length);
+		return mame_fread(romdata->file, buffer, length);
 
 	/* otherwise, fill with randomness */
 	else
@@ -1649,7 +1649,7 @@ static int process_rom_entries(struct rom_load_data *romdata, const struct RomMo
 
 					/* reseek to the start and clear the baserom so we don't reverify */
 					if (romdata->file)
-						mame_fseek((mame_file*) romdata->file, 0, SEEK_SET);
+						mame_fseek(romdata->file, 0, SEEK_SET);
 					baserom = NULL;
 					explength = 0;
 				}
@@ -1659,7 +1659,7 @@ static int process_rom_entries(struct rom_load_data *romdata, const struct RomMo
 				if (romdata->file)
 				{
 					debugload("Closing ROM file\n");
-					mame_fclose((mame_file*) romdata->file);
+					mame_fclose(romdata->file);
 					romdata->file = NULL;
 				}
 			}
@@ -1674,7 +1674,7 @@ static int process_rom_entries(struct rom_load_data *romdata, const struct RomMo
 	/* error case */
 fatalerror:
 	if (romdata->file)
-		mame_fclose((mame_file*) romdata->file);
+		mame_fclose(romdata->file);
 	romdata->file = NULL;
 	return 0;
 }

@@ -112,7 +112,7 @@ static UINT32 ss_get_signature(void)
 		}
 	}
 
-	info = (char*) malloc(size);
+	info = malloc(size);
 
 	// Pass 2 : write signature info
 
@@ -198,9 +198,9 @@ static ss_module *ss_get_module(const char *name)
 			break;
 		mp = &((*mp)->next);
 	}
-	*mp = (ss_module*) malloc(sizeof(ss_module));
+	*mp = malloc(sizeof(ss_module));
 	if (*mp == NULL) return NULL;
-	(*mp)->name = (char*) malloc (strlen (name) + 1);
+	(*mp)->name = malloc (strlen (name) + 1);
 	if ((*mp)->name == NULL) return NULL;
 	strcpy ((*mp)->name, name);
 	(*mp)->next = m;
@@ -224,9 +224,9 @@ static ss_entry *ss_register_entry(const char *module, int instance, const char 
 			break;
 		ep = &((*ep)->next);
 	}
-	*ep = (ss_entry*) malloc(sizeof(ss_entry));
+	*ep = malloc(sizeof(ss_entry));
 	if (*ep == NULL) return NULL;
-	(*ep)->name = (char*) malloc (strlen (name) + 1);
+	(*ep)->name = malloc (strlen (name) + 1);
 	if ((*ep)->name == NULL) return NULL;
 	strcpy ((*ep)->name, name);
 	(*ep)->next   = e;
@@ -307,7 +307,7 @@ static void ss_register_func(ss_func **root, void (*func)(void))
 		next = next->next;
 	}
 	next = *root;
-	*root = (ss_func*) malloc(sizeof(ss_func));
+	*root = malloc(sizeof(ss_func));
 	if (*root == NULL)
 	{
 		logerror ("malloc failed in ss_register_func\n");
@@ -400,7 +400,7 @@ void state_save_save_begin(mame_file *file)
 	}
 
 	TRACE(logerror("   total size %u\n", ss_dump_size));
-	ss_dump_array = (unsigned char*) malloc(ss_dump_size);
+	ss_dump_array = malloc(ss_dump_size);
 	if (ss_dump_array == NULL)
 	{
 		logerror ("malloc failed in state_save_save_begin\n");
@@ -489,8 +489,8 @@ int state_save_load_begin(mame_file *file)
 
 	signature = ss_get_signature();
 
-	ss_dump_size = (unsigned int) mame_fsize(file);
-	ss_dump_array = (unsigned char*) malloc(ss_dump_size);
+	ss_dump_size = mame_fsize(file);
+	ss_dump_array = malloc(ss_dump_size);
 	ss_dump_file = file;
 	mame_fread(ss_dump_file, ss_dump_array, ss_dump_size);
 
@@ -577,7 +577,7 @@ void state_save_load_continue(void)
 					} else {
 						memcpy(e->data, ss_dump_array + e->offset, ss_size[e->type]*e->size);
 						if (need_convert && ss_conv[e->type])
-							ss_conv[e->type]((unsigned char*) e->data, e->size);
+							ss_conv[e->type](e->data, e->size);
 						TRACE(logerror("    %s.%d.%s: %x..%x\n", m->name, i, e->name, e->offset, e->offset+ss_size[e->type]*e->size-1));
 					}
 				}
