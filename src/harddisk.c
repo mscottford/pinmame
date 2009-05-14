@@ -45,10 +45,8 @@
 
 #define SET_ERROR_AND_CLEANUP(err) do { last_error = (err); goto cleanup; } while (0)
 
-#ifndef __cplusplus
 #ifdef _MSC_VER
 #define interface interface_
-#endif
 #endif
 
 /*************************************
@@ -129,24 +127,13 @@ INLINE UINT64 offset_from_mapentry(mapentry_t *entry)
 	return (*entry) & 0x00000fffffffffffULL;
 }
 #else
-
-#ifndef __cplusplus
-INLINE 
-#else
-static
-#endif
-UINT64 offset_from_mapentry(mapentry_t *entry)
+INLINE UINT64 offset_from_mapentry(mapentry_t *entry)
 {
 	return (*entry << 20) >> 20;
 }
 #endif
 
-#ifndef __cplusplus
-INLINE 
-#else
-static
-#endif
-UINT32 length_from_mapentry(mapentry_t *entry)
+INLINE UINT32 length_from_mapentry(mapentry_t *entry)
 {
 	return *entry >> 44;
 }
@@ -158,24 +145,13 @@ INLINE void encode_mapentry(mapentry_t *entry, UINT64 offset, UINT32 length)
 	*entry = ((UINT64)length << 44) | (offset & 0x00000fffffffffffULL);
 }
 #else
-
-#ifndef __cplusplus
-INLINE 
-#else
-static
-#endif
-void encode_mapentry(mapentry_t *entry, UINT64 offset, UINT32 length)
+INLINE void encode_mapentry(mapentry_t *entry, UINT64 offset, UINT32 length)
 {
 	*entry = ((UINT64)length << 44) | ((offset << 20) >> 20);
 }
 #endif
 
-#ifndef __cplusplus
-INLINE 
-#else
-static
-#endif
-void byteswap_mapentry(mapentry_t *entry)
+INLINE void byteswap_mapentry(mapentry_t *entry)
 {
 #ifdef LSB_FIRST
 	mapentry_t temp = *entry;
@@ -188,22 +164,12 @@ void byteswap_mapentry(mapentry_t *entry)
 #endif
 }
 
-#ifndef __cplusplus
-INLINE 
-#else
-static
-#endif
-UINT32 get_bigendian_uint32(UINT8 *base)
+INLINE UINT32 get_bigendian_uint32(UINT8 *base)
 {
 	return (base[0] << 24) | (base[1] << 16) | (base[2] << 8) | base[3];
 }
 
-#ifndef __cplusplus
-INLINE 
-#else
-static
-#endif
-void put_bigendian_uint32(UINT8 *base, UINT32 value)
+INLINE void put_bigendian_uint32(UINT8 *base, UINT32 value)
 {
 	base[0] = value >> 24;
 	base[1] = value >> 16;
@@ -380,7 +346,7 @@ void *hard_disk_open(const char *filename, int writeable, void *parent)
 		SET_ERROR_AND_CLEANUP(HDERR_FILE_NOT_FOUND);
 
 	/* punt if invalid parent */
-	info.parent = (struct hard_disk_info*) parent;
+	info.parent = parent;
 	if (info.parent && info.parent->cookie != COOKIE_VALUE)
 		SET_ERROR_AND_CLEANUP(HDERR_INVALID_PARAMETER);
 
@@ -408,13 +374,13 @@ void *hard_disk_open(const char *filename, int writeable, void *parent)
 		SET_ERROR_AND_CLEANUP(err);
 
 	/* allocate and init the block cache */
-	info.cache = (UINT8*) malloc(info.header.blocksize * info.header.seclen);
+	info.cache = malloc(info.header.blocksize * info.header.seclen);
 	if (!info.cache)
 		SET_ERROR_AND_CLEANUP(HDERR_OUT_OF_MEMORY);
 	info.cacheblock = -1;
 
 	/* allocate the temporary compressed buffer */
-	info.compressed = (UINT8*) malloc(info.header.blocksize * info.header.seclen);
+	info.compressed = malloc(info.header.blocksize * info.header.seclen);
 	if (!info.compressed)
 		SET_ERROR_AND_CLEANUP(HDERR_OUT_OF_MEMORY);
 
@@ -424,7 +390,7 @@ void *hard_disk_open(const char *filename, int writeable, void *parent)
 		SET_ERROR_AND_CLEANUP(err);
 
 	/* okay, now allocate our entry and copy it */
-	finalinfo = (struct hard_disk_info*) malloc(sizeof(info));
+	finalinfo = malloc(sizeof(info));
 	if (!finalinfo)
 		SET_ERROR_AND_CLEANUP(HDERR_OUT_OF_MEMORY);
 	*finalinfo = info;
@@ -461,7 +427,7 @@ cleanup:
 
 void hard_disk_close(void *disk)
 {
-	struct hard_disk_info *info = (struct hard_disk_info*) disk;
+	struct hard_disk_info *info = disk;
 	struct hard_disk_info *curr, *prev;
 
 	/* punt if NULL or invalid */
@@ -527,7 +493,7 @@ void hard_disk_close_all(void)
 
 UINT32 hard_disk_read(void *disk, UINT32 lbasector, UINT32 numsectors, void *buffer)
 {
-	struct hard_disk_info *info = (struct hard_disk_info*) disk;
+	struct hard_disk_info *info = disk;
 	UINT32 block, offset;
 	int err;
 
@@ -584,7 +550,7 @@ cleanup:
 
 UINT32 hard_disk_write(void *disk, UINT32 lbasector, UINT32 numsectors, const void *buffer)
 {
-	struct hard_disk_info *info = (struct hard_disk_info*) disk;
+	struct hard_disk_info *info = disk;
 	UINT32 block, offset, count;
 	UINT64 fileoffset;
 	int err;
@@ -675,7 +641,7 @@ int hard_disk_get_last_error(void)
 
 const struct hard_disk_header *hard_disk_get_header(void *disk)
 {
-	const struct hard_disk_info *info = (struct hard_disk_info*) disk;
+	const struct hard_disk_info *info = disk;
 
 	/* punt if NULL or invalid */
 	if (!info || info->cookie != COOKIE_VALUE)
@@ -824,7 +790,7 @@ int hard_disk_compress(const char *rawfile, UINT32 offset, const char *newfile, 
 	/* open the diff file */
 	if (difffile)
 	{
-		comparefile = (struct hard_disk_info*) hard_disk_open(difffile, 0, NULL);
+		comparefile = hard_disk_open(difffile, 0, NULL);
 		if (!comparefile) SET_ERROR_AND_CLEANUP(HDERR_FILE_NOT_FOUND);
 	}
 
@@ -835,7 +801,7 @@ int hard_disk_compress(const char *rawfile, UINT32 offset, const char *newfile, 
 	if (err != HDERR_NONE) SET_ERROR_AND_CLEANUP(err);
 
 	/* now open it writeable */
-	destfile = (struct hard_disk_info*) hard_disk_open(newfile, 1, comparefile);
+	destfile = hard_disk_open(newfile, 1, comparefile);
 	if (!destfile) SET_ERROR_AND_CLEANUP(HDERR_CANT_CREATE_FILE);
 	readbackheader = hard_disk_get_header(destfile);
 
@@ -845,9 +811,9 @@ int hard_disk_compress(const char *rawfile, UINT32 offset, const char *newfile, 
 	/* NOTE: this array can be BIG bmcompm2 has over a million blocks */
 	/* if this could be allocated dynamically as needed it would be good */
 	/* but i don't know how to do that in C */
-	unique_blocks = (struct hard_disk_block*) malloc(sizeof(struct hard_disk_block) * readbackheader->totalblocks);
+	unique_blocks=malloc(sizeof(struct hard_disk_block) * readbackheader->totalblocks);
 	/* allocate the temp cache array */
-	temp_cache = (UINT8*) malloc(destfile->header.blocksize * destfile->header.seclen);
+	temp_cache=malloc(destfile->header.blocksize * destfile->header.seclen);
 /* END DUPE BLOCK */
 
 	/* init the MD5 computation */
@@ -863,7 +829,7 @@ int hard_disk_compress(const char *rawfile, UINT32 offset, const char *newfile, 
 /* END DUPE BLOCK */
 	lastupdate = 0;
 
-	while ((UINT32) block < readbackheader->totalblocks)
+	while (block < readbackheader->totalblocks)
 	{
 		int write_this_block = 1;
 		clock_t curtime = clock();
@@ -883,7 +849,7 @@ int hard_disk_compress(const char *rawfile, UINT32 offset, const char *newfile, 
 
 		/* determine how much to MD5 */
 		bytestomd5 = blocksizebytes;
-		if ((block + 1) * destfile->header.blocksize > (UINT32) totalsectors)
+		if ((block + 1) * destfile->header.blocksize > totalsectors)
 		{
 			bytestomd5 = (totalsectors - block * destfile->header.blocksize) * destfile->header.seclen;
 			if (bytestomd5 < 0)
@@ -1069,7 +1035,7 @@ int hard_disk_verify(const char *hdfile, void (*progress)(const char *, ...), UI
 		SET_ERROR_AND_CLEANUP(HDERR_INVALID_PARAMETER);
 
 	/* open the disk file */
-	sourcefile = (struct hard_disk_info*) hard_disk_open(hdfile, 0, NULL);
+	sourcefile = hard_disk_open(hdfile, 0, NULL);
 	if (!sourcefile)
 		SET_ERROR_AND_CLEANUP(HDERR_FILE_NOT_FOUND);
 
@@ -1087,7 +1053,7 @@ int hard_disk_verify(const char *hdfile, void (*progress)(const char *, ...), UI
 	totalsectors = sourcefile->header.cylinders * sourcefile->header.heads * sourcefile->header.sectors;
 	blocksizebytes = sourcefile->header.blocksize * sourcefile->header.seclen;
 	lastupdate = 0;
-	while ((UINT32) block < sourcefile->header.totalblocks)
+	while (block < sourcefile->header.totalblocks)
 	{
 		clock_t curtime = clock();
 		int bytestomd5;
@@ -1107,7 +1073,7 @@ int hard_disk_verify(const char *hdfile, void (*progress)(const char *, ...), UI
 
 		/* determine how much to MD5 */
 		bytestomd5 = blocksizebytes;
-		if ((block + 1) * sourcefile->header.blocksize > (UINT32) totalsectors)
+		if ((block + 1) * sourcefile->header.blocksize > totalsectors)
 		{
 			bytestomd5 = (totalsectors - block * sourcefile->header.blocksize) * sourcefile->header.seclen;
 			if (bytestomd5 < 0)
@@ -1172,7 +1138,7 @@ static int read_block_into_cache(struct hard_disk_info *info, UINT32 block)
 	{
 		case HDCOMPRESSION_ZLIB:
 		{
-			struct zlib_codec_data *codec = (struct zlib_codec_data*) info->codecdata;
+			struct zlib_codec_data *codec = info->codecdata;
 			int err;
 
 			/* reset the decompressor */
@@ -1221,7 +1187,7 @@ static int write_block_from_cache(struct hard_disk_info *info, UINT32 block)
 	{
 		case HDCOMPRESSION_ZLIB:
 		{
-			struct zlib_codec_data *codec = (struct zlib_codec_data*) info->codecdata;
+			struct zlib_codec_data *codec = info->codecdata;
 			int err;
 
 			/* reset the decompressor */
@@ -1315,7 +1281,7 @@ static int read_header(void *file, struct hard_disk_header *header)
 	if ((header->version != 1) && (header->version != 2))
 		return HDERR_INVALID_DATA;
 
-	if (header->length < (UINT32) ((header->version == 1) ? HARD_DISK_V1_HEADER_SIZE : HARD_DISK_V2_HEADER_SIZE))
+	if (header->length < ((header->version == 1) ? HARD_DISK_V1_HEADER_SIZE : HARD_DISK_V2_HEADER_SIZE))
 		return HDERR_INVALID_DATA;
 
 	header->flags         = get_bigendian_uint32(&rawheader[16]);
@@ -1403,7 +1369,7 @@ static int read_sector_map(struct hard_disk_info *info)
 	UINT32 count;
 
 	/* first allocate memory */
-	info->map = (mapentry_t*) malloc(sizeof(info->map[0]) * info->header.totalblocks);
+	info->map = malloc(sizeof(info->map[0]) * info->header.totalblocks);
 	if (!info->map)
 		return HDERR_OUT_OF_MEMORY;
 
@@ -1425,7 +1391,7 @@ static int read_sector_map(struct hard_disk_info *info)
 
 	/* compute the EOF and byteswap as necessary */
 	info->eof = info->header.length + sizeof(info->map[0]) * (info->header.totalblocks + 1);
-	for (i = 0; (UINT32) i < info->header.totalblocks; i++)
+	for (i = 0; i < info->header.totalblocks; i++)
 	{
 		UINT64 end;
 
@@ -1463,7 +1429,7 @@ cleanup:
 
 static voidpf fast_alloc(voidpf opaque, uInt items, uInt size)
 {
-	struct zlib_codec_data *data = (struct zlib_codec_data*) opaque;
+	struct zlib_codec_data *data = opaque;
 	UINT32 *ptr;
 	int i;
 
@@ -1483,7 +1449,7 @@ static voidpf fast_alloc(voidpf opaque, uInt items, uInt size)
 	}
 
 	/* alloc a new one */
-	ptr = (UINT32*) malloc(size + sizeof(UINT32));
+	ptr = malloc(size + sizeof(UINT32));
 	if (!ptr)
 		return NULL;
 
@@ -1503,7 +1469,7 @@ static voidpf fast_alloc(voidpf opaque, uInt items, uInt size)
 
 static void fast_free(voidpf opaque, voidpf address)
 {
-	struct zlib_codec_data *data = (struct zlib_codec_data*) opaque;
+	struct zlib_codec_data *data = opaque;
 	UINT32 *ptr = (UINT32 *)address - 1;
 	int i;
 
@@ -1546,7 +1512,7 @@ static int init_codec(struct hard_disk_info *info)
 				return HDERR_OUT_OF_MEMORY;
 
 			/* clear the buffers */
-			data = (struct zlib_codec_data*) info->codecdata;
+			data = info->codecdata;
 			memset(data, 0, sizeof(struct zlib_codec_data));
 
 			/* init the first for decompression and the second for compression */
@@ -1604,7 +1570,7 @@ static void free_codec(struct hard_disk_info *info)
 
 		case HDCOMPRESSION_ZLIB:
 		{
-			struct zlib_codec_data *data = (struct zlib_codec_data*) info->codecdata;
+			struct zlib_codec_data *data = info->codecdata;
 
 			/* deinit the streams */
 			if (data)

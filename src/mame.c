@@ -246,12 +246,7 @@ static int init_buffered_spriteram(void);
 	printed
 -------------------------------------------------*/
 
-#ifndef __cplusplus
-INLINE
-#else
-static
-#endif
-void bail_and_print(const char *message)
+INLINE void bail_and_print(const char *message)
 {
 	if (!bailing)
 	{
@@ -489,7 +484,7 @@ static int run_machine(void)
 						int i;
 
 						/* invalidate contents to avoid subtle bugs */
-						for (i = 0; (size_t) i < memory_region_length(region); i++)
+						for (i = 0; i < memory_region_length(region); i++)
 							memory_region(region)[i] = rand();
 						free(Machine->memory_region[region].base);
 						Machine->memory_region[region].base = 0;
@@ -1026,7 +1021,7 @@ static int init_buffered_spriteram(void)
 	}
 
 	/* allocate memory for the back buffer */
-	buffered_spriteram = (data8_t*) auto_malloc(spriteram_size);
+	buffered_spriteram = auto_malloc(spriteram_size);
 	if (!buffered_spriteram)
 		return 1;
 
@@ -1037,7 +1032,7 @@ static int init_buffered_spriteram(void)
 	if (spriteram_2_size)
 	{
 		/* allocate memory */
-		buffered_spriteram_2 = (data8_t*) auto_malloc(spriteram_2_size);
+		buffered_spriteram_2 = auto_malloc(spriteram_2_size);
 		if (!buffered_spriteram_2)
 			return 1;
 
