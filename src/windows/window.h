@@ -164,26 +164,46 @@ int win_create_menu(HMENU *menus);
 //	win_color16
 //============================================================
 
-INLINE UINT16 win_color16(UINT8 r, UINT8 g, UINT8 b)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+UINT16 win_color16(UINT8 r, UINT8 g, UINT8 b)
 {
 	return ((r >> win_color16_rsrc_shift) << win_color16_rdst_shift) |
 		   ((g >> win_color16_gsrc_shift) << win_color16_gdst_shift) |
 		   ((b >> win_color16_bsrc_shift) << win_color16_bdst_shift);
 }
 
-INLINE UINT8 win_red16(UINT16 color)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+UINT8 win_red16(UINT16 color)
 {
 	int val = (color >> win_color16_rdst_shift) << win_color16_rsrc_shift;
 	return val | (val >> (8 - win_color16_rsrc_shift));
 }
 
-INLINE UINT8 win_green16(UINT16 color)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+UINT8 win_green16(UINT16 color)
 {
 	int val = (color >> win_color16_gdst_shift) << win_color16_gsrc_shift;
 	return val | (val >> (8 - win_color16_gsrc_shift));
 }
 
-INLINE UINT8 win_blue16(UINT16 color)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+UINT8 win_blue16(UINT16 color)
 {
 	int val = (color >> win_color16_bdst_shift) << win_color16_bsrc_shift;
 	return val | (val >> (8 - win_color16_bsrc_shift));
@@ -195,24 +215,44 @@ INLINE UINT8 win_blue16(UINT16 color)
 //	win_color32
 //============================================================
 
-INLINE UINT32 win_color32(UINT8 r, UINT8 g, UINT8 b)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+UINT32 win_color32(UINT8 r, UINT8 g, UINT8 b)
 {
 	return (r << win_color32_rdst_shift) |
 		   (g << win_color32_gdst_shift) |
 		   (b << win_color32_bdst_shift);
 }
 
-INLINE UINT8 win_red32(UINT32 color)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+UINT8 win_red32(UINT32 color)
 {
 	return color >> win_color32_rdst_shift;
 }
 
-INLINE UINT8 win_green32(UINT32 color)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+UINT8 win_green32(UINT32 color)
 {
 	return color >> win_color32_gdst_shift;
 }
 
-INLINE UINT8 win_blue32(UINT32 color)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+UINT8 win_blue32(UINT32 color)
 {
 	return color >> win_color32_bdst_shift;
 }
@@ -223,7 +263,12 @@ INLINE UINT8 win_blue32(UINT32 color)
 //	win_has_menu
 //============================================================
 
-INLINE BOOL win_has_menu(void)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+BOOL win_has_menu(void)
 {
 #if HAS_WINDOW_MENU
 	return GetMenu(win_video_window) ? TRUE : FALSE;

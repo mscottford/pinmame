@@ -70,7 +70,12 @@ int code_init(void)
 }
 
 /* Find the osd record of an oscode */
-INLINE const struct KeyboardInfo* internal_oscode_find_keyboard(unsigned oscode)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+const struct KeyboardInfo* internal_oscode_find_keyboard(unsigned oscode)
 {
 	const struct KeyboardInfo *keyinfo;
 	keyinfo = osd_get_key_list();
@@ -83,7 +88,12 @@ INLINE const struct KeyboardInfo* internal_oscode_find_keyboard(unsigned oscode)
 	return 0;
 }
 
-INLINE const struct JoystickInfo* internal_oscode_find_joystick(unsigned oscode)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+const struct JoystickInfo* internal_oscode_find_joystick(unsigned oscode)
 {
 	const struct JoystickInfo *joyinfo;
 	joyinfo = osd_get_joy_list();
@@ -131,7 +141,7 @@ static int internal_oscode_find(unsigned oscode, unsigned type)
 static int internal_oscode_add(unsigned oscode, unsigned type)
 {
 	struct code_info* new_code_map;
-	new_code_map = realloc( code_map, (code_mac+1) * sizeof(struct code_info) );
+	new_code_map = (struct code_info*) realloc( code_map, (code_mac+1) * sizeof(struct code_info) );
 	if (new_code_map)
 	{
 		code_map = new_code_map;
@@ -145,7 +155,12 @@ static int internal_oscode_add(unsigned oscode, unsigned type)
 }
 
 /* Find the osd record of a standard code */
-INLINE const struct KeyboardInfo* internal_code_find_keyboard(InputCode code)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+const struct KeyboardInfo* internal_code_find_keyboard(InputCode code)
 {
 	const struct KeyboardInfo *keyinfo;
 	keyinfo = osd_get_key_list();
@@ -171,7 +186,12 @@ INLINE const struct KeyboardInfo* internal_code_find_keyboard(InputCode code)
 	return 0;
 }
 
-INLINE const struct JoystickInfo* internal_code_find_joystick(InputCode code)
+#ifndef __cplusplus
+INLINE
+#else
+static
+#endif
+const struct JoystickInfo* internal_code_find_joystick(InputCode code)
 {
 	const struct JoystickInfo *joyinfo;
 	joyinfo = osd_get_joy_list();
