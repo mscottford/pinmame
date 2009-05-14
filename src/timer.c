@@ -95,12 +95,7 @@ static double callback_timer_expire_time;
 	relative to the global_offset
 -------------------------------------------------*/
 
-#ifndef __cplusplus
-INLINE
-#else
-static
-#endif
-double get_relative_time(void)
+INLINE double get_relative_time(void)
 {
 	int activecpu;
 
@@ -123,12 +118,7 @@ double get_relative_time(void)
 	timer_new - allocate a new timer
 -------------------------------------------------*/
 
-#ifndef __cplusplus
-INLINE
-#else
-static
-#endif
-mame_timer *timer_new(void)
+INLINE mame_timer *timer_new(void)
 {
 	mame_timer *timer;
 
@@ -150,12 +140,7 @@ mame_timer *timer_new(void)
 	the list at the appropriate location
 -------------------------------------------------*/
 
-#ifndef __cplusplus
-INLINE
-#else
-static
-#endif
-void timer_list_insert(mame_timer *timer)
+INLINE void timer_list_insert(mame_timer *timer)
 {
 	double expire = timer->enabled ? timer->expire : TIME_NEVER;
 	mame_timer *t, *lt = NULL;
@@ -214,12 +199,7 @@ void timer_list_insert(mame_timer *timer)
 	linked list
 -------------------------------------------------*/
 
-#ifndef __cplusplus
-INLINE
-#else
-static
-#endif
-void timer_list_remove(mame_timer *timer)
+INLINE void timer_list_remove(mame_timer *timer)
 {
 	/* sanity checks for the debug build */
 	#ifdef MAME_DEBUG

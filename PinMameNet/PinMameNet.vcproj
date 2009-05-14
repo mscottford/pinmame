@@ -219,35 +219,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\harddisk.c"
-				>
-			</File>
-			<File
-				RelativePath="..\src\hash.c"
-				>
-			</File>
-			<File
-				RelativePath="..\src\input.c"
-				>
-			</File>
-			<File
-				RelativePath="..\src\mame.c"
-				>
-			</File>
-			<File
-				RelativePath="..\src\mame.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\memory.c"
 				>
 			</File>
 			<File
 				RelativePath=".\PinMameNet.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\png.c"
 				>
 			</File>
 			<File
@@ -275,15 +251,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\src\timer.c"
-				>
-			</File>
-			<File
 				RelativePath="..\src\usrintrf.c"
-				>
-			</File>
-			<File
-				RelativePath="..\src\windows\video.c"
 				>
 			</File>
 			<Filter

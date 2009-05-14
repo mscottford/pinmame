@@ -420,11 +420,7 @@ void win_disorient_rect(struct rectangle *rect)
 //============================================================
 //  devices_enum_callback
 //============================================================
-static BOOL 
-#ifndef __cplusplus
-WINAPI 
-#endif
-devices_enum_callback(GUID *lpGUID, LPSTR lpDriverDescription,
+static BOOL WINAPI devices_enum_callback(GUID *lpGUID, LPSTR lpDriverDescription,
 										 LPSTR lpDriverName, LPVOID lpContext, HMONITOR hm)
 {
 	screen_guid_ptr = NULL;
@@ -486,11 +482,8 @@ int osd_create_display(const struct osd_create_params *params, UINT32 *rgb_compo
 	// proper screen
 
 	screen_guid_ptr = NULL;
-
-#ifndef __cplusplus
-	if (win_use_ddraw)
+ 	if (win_use_ddraw)
 		DirectDrawEnumerateEx(devices_enum_callback, NULL, DDENUM_ATTACHEDSECONDARYDEVICES | DDENUM_DETACHEDSECONDARYDEVICES);
-#endif
 
 	// create the window
 	if (win_create_window(video_width, video_height, video_depth, video_attributes, aspect_ratio))

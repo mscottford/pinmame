@@ -52,7 +52,7 @@ int png_unfilter(struct png_info *p)
 	dst = p->image;
 	bpp = p->bpp;
 
-	for (i=0; (UINT32) i<p->height; i++)
+	for (i=0; i<p->height; i++)
 	{
 		filter = *src++;
 		if (!filter)
@@ -62,7 +62,7 @@ int png_unfilter(struct png_info *p)
 			dst += p->rowbytes;
 		}
 		else
-			for (j=0; (UINT32) j<p->rowbytes; j++)
+			for (j=0; j<p->rowbytes; j++)
 			{
 				pA = (j<bpp) ? 0: *(dst - bpp);
 				pB = (i<1) ? 0: *(dst - p->rowbytes);
@@ -158,7 +158,7 @@ int png_read_file(mame_file *fp, struct png_info *p)
 		UINT8 *data;
 	} *ihead, *pidat;
 
-	if ((ihead = (struct idat*) malloc (sizeof(struct idat))) == 0)
+	if ((ihead = malloc (sizeof(struct idat))) == 0)
 		return 0;
 
 	pidat = ihead;
@@ -252,7 +252,7 @@ int png_read_file(mame_file *fp, struct png_info *p)
 		case PNG_CN_IDAT:
 			pidat->data = chunk_data;
 			pidat->length = chunk_length;
-			if ((pidat->next = (struct idat*) malloc (sizeof(struct idat))) == 0)
+			if ((pidat->next = malloc (sizeof(struct idat))) == 0)
 				return 0;
 			pidat = pidat->next;
 			pidat->next = 0;
@@ -332,7 +332,7 @@ int png_read_file(mame_file *fp, struct png_info *p)
 		free (pidat);
 	}
 	p->bpp = (samples[p->color_type] * p->bit_depth) / 8;
-	p->rowbytes = (UINT32) ceil((p->width * p->bit_depth * samples[p->color_type]) / 8.0);
+	p->rowbytes = ceil((p->width * p->bit_depth * samples[p->color_type]) / 8.0);
 
 	if (png_inflate_image(p)==0)
 		return 0;
@@ -469,9 +469,9 @@ int png_expand_buffer_8bit (struct png_info *p)
 		inp = p->image;
 		outp = outbuf;
 
-		for (i = 0; (UINT32) i < p->height; i++)
+		for (i = 0; i < p->height; i++)
 		{
-			for(j = 0; (UINT32) j < p->width / ( 8 / p->bit_depth); j++)
+			for(j = 0; j < p->width / ( 8 / p->bit_depth); j++)
 			{
 				for (k = 8 / p->bit_depth-1; k >= 0; k--)
 					*outp++ = (*inp >> k * p->bit_depth) & (0xff >> (8 - p->bit_depth));
@@ -500,17 +500,17 @@ void png_delete_unused_colors (struct png_info *p)
 	memcpy (ttemp, p->trans, p->num_trans);
 
 	/* check which colors are actually used */
-	for (i = 0; (UINT32) i < p->height*p->width; i++)
+	for (i = 0; i < p->height*p->width; i++)
 		tab[p->image[i]]++;
 
 	/* shrink palette and transparency */
-	for (i = 0; (UINT32) i < p->num_palette; i++)
+	for (i = 0; i < p->num_palette; i++)
 		if (tab[i])
 		{
 			p->palette[3*pen+0]=ptemp[3*i+0];
 			p->palette[3*pen+1]=ptemp[3*i+1];
 			p->palette[3*pen+2]=ptemp[3*i+2];
-			if ((UINT32) i < p->num_trans)
+			if (i < p->num_trans)
 			{
 				p->trans[pen] = ttemp[i];
 				trns++;
@@ -519,7 +519,7 @@ void png_delete_unused_colors (struct png_info *p)
 		}
 
 	/* remap colors */
-	for (i = 0; (UINT32) i < p->height*p->width; i++)
+	for (i = 0; i < p->height*p->width; i++)
 		p->image[i]=tab[p->image[i]];
 
 	if (p->num_palette!=pen)
@@ -556,12 +556,12 @@ int png_add_text (const char *keyword, const char *text)
 {
 	struct png_text *pt;
 
-	pt = (struct png_text*) malloc(sizeof(struct png_text));
+	pt = malloc (sizeof(struct png_text));
 	if (pt == 0)
 		return 0;
 
 	pt->length = strlen(keyword) + strlen(text) + 1;
-	pt->data = (char*) malloc (pt->length + 1);
+	pt->data = malloc (pt->length + 1);
 	if (pt->data == 0)
 		return 0;
 
@@ -678,7 +678,7 @@ int png_filter(struct png_info *p)
 	dst = p->fimage;
 	src = p->image;
 
-	for (i=0; (UINT32) i<p->height; i++)
+	for (i=0; i<p->height; i++)
 	{
 		*dst++ = 0; /* No filter */
 		memcpy (dst, src, p->rowbytes);
@@ -692,7 +692,7 @@ int png_deflate_image(struct png_info *p)
 {
 	unsigned long zbuff_size;
 
-	zbuff_size = (unsigned long) (p->height*(p->rowbytes+1))*1.1+12;
+	zbuff_size = (p->height*(p->rowbytes+1))*1.1+12;
 
 	if((p->zimage = (UINT8 *)malloc (zbuff_size))==NULL)
 	{
@@ -719,9 +719,9 @@ static int png_pack_buffer (struct png_info *p)
 
 	if (p->bit_depth < 8)
 	{
-		for (i=0; (UINT32) i<p->height; i++)
+		for (i=0; i<p->height; i++)
 		{
-			for(j=0; (UINT32) j<p->width/(8/p->bit_depth); j++)
+			for(j=0; j<p->width/(8/p->bit_depth); j++)
 			{
 				for (k=8/p->bit_depth-1; k>=0; k--)
 					*outp |= *inp++ << k * p->bit_depth;
@@ -773,7 +773,7 @@ static int png_create_datastream(void *fp, struct mame_bitmap *bitmap)
 		}
 		memset (p.palette, 0, 3*256);
 		/* get palette */
-		for (i = 0; (UINT32) i < Machine->drv->total_colors; i++)
+		for (i = 0; i < Machine->drv->total_colors; i++)
 			palette_get_color(i,&p.palette[3*i],&p.palette[3*i+1],&p.palette[3*i+2]);
 
 		p.num_palette = 256;
@@ -783,13 +783,13 @@ static int png_create_datastream(void *fp, struct mame_bitmap *bitmap)
 			return 0;
 		}
 
-		for (i = 0; (UINT32) i < p.height; i++)
-			for (j = 0; (UINT32) j < p.width; j++)
-				p.image[i * p.width + j] = (UINT8) ((UINT16 *)bitmap->line[i])[j];
+		for (i = 0; i < p.height; i++)
+			for (j = 0; j < p.width; j++)
+				p.image[i * p.width + j] = ((UINT16 *)bitmap->line[i])[j];
 
 		png_delete_unused_colors (&p);
 		p.bit_depth = p.num_palette > 16 ? 8 : p.num_palette > 4 ? 4 : p.num_palette > 2 ? 2 : 1;
-		p.rowbytes = (UINT32) ceil((p.width*p.bit_depth)/8.0);
+		p.rowbytes=ceil((p.width*p.bit_depth)/8.0);
 		if (png_pack_buffer (&p) == 0)
 			return 0;
 
@@ -859,7 +859,7 @@ static int png_create_datastream(void *fp, struct mame_bitmap *bitmap)
 	if (png_deflate_image(&p)==0)
 		return 0;
 
-	if (png_write_datastream((mame_file*) fp, &p)==0)
+	if (png_write_datastream(fp, &p)==0)
 		return 0;
 
 	if (p.palette) free (p.palette);
