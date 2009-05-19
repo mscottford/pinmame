@@ -37,10 +37,8 @@ X86_MIPS3_DRC = 1
 
 
 # set this the operating system you're building for
-# MAMEOS = msdos
-# MAMEOS = windows
 ifeq ($(MAMEOS),)
-MAMEOS = windows
+MAMEOS = ruby
 endif
 
 # extension for executables
@@ -104,11 +102,11 @@ DEFS = -DX86_ASM -DLSB_FIRST -DINLINE="static __inline__" -Dasm=__asm__
 CFLAGS = -std=gnu99 -Isrc -Isrc/includes -Isrc/$(MAMEOS) -I$(OBJ)/cpu/m68000 -Isrc/cpu/m68000
 
 ifdef SYMBOLS
-CFLAGS += -O0 -Wall -Werror -Wno-unused -g
+CFLAGS += -O0 -Wall -Wno-unused -g
 else
 CFLAGS += -DNDEBUG \
 	$(ARCH) -O3 -fomit-frame-pointer -fstrict-aliasing \
-	-Werror -Wall -Wno-sign-compare -Wunused \
+	-Wall -Wno-sign-compare -Wunused \
 	-Wpointer-arith -Wbad-function-cast -Wcast-align -Waggregate-return \
 	-Wshadow -Wstrict-prototypes -Wundef \
 	-Wformat-security -Wwrite-strings \

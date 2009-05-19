@@ -34,7 +34,6 @@ ACK to ACK and STROBE to STROBE.
 
 #include "driver.h"
 #include "votrax.h"
-#include "windows.h"
 #ifdef REAL_DEVICE
 #include "dlportio.h"
 #endif
@@ -70,6 +69,7 @@ const int _dataOutAdr	= 0x378;
 const int _statusInAdr	= 0x379;
 const int _ctrlOutAdr  = 0x37a;
 
+#define byte unsigned char
 const byte _bitmaskAck = 0x40;
 
 const byte _pitchMask = 0x40;
