@@ -1,45 +1,5 @@
-# set this to mame, mess or the destination you want to build
-# TARGET = mame
-# TARGET = mess
-# TARGET = neomame
-# TARGET = cpmame
-# TARGET = pinmame
-# TARGET = mmsnd
-# example for a tiny compile
-# TARGET = tiny
-ifeq ($(TARGET),)
 TARGET = pinmame
-endif
-
-# uncomment next line to include running older stern whitestar games in new at91 cpu board for testing
-# TEST_NEW_SOUND = 1
-
-# uncomment next line to include the debugger
-# DEBUG = 1
-
-# uncomment next line to include the symbols for symify
-# SYMBOLS = 1
-
-# uncomment next line to generate a link map for exception handling in windows
-# MAP = 1
-
-# uncomment next line to use Assembler 68000 engine
-# X86_ASM_68000 = 1
-
-# uncomment next line to use Assembler 68020 engine
-# X86_ASM_68020 = 1
-
-# uncomment next line to use DRC MIPS3 engine
-X86_MIPS3_DRC = 1
-
-# uncomment next line to use cygwin compiler
-# COMPILESYSTEM_CYGWIN	= 1
-
-
-# set this the operating system you're building for
-ifeq ($(MAMEOS),)
 MAMEOS = ruby
-endif
 
 # extension for executables
 EXE = .exe
@@ -55,41 +15,8 @@ ASM = @nasm
 ASMFLAGS = -f coff
 MD = -mkdir
 RM = @rm -f
-#PERL = @perl -w
 
-
-ifeq ($(MAMEOS),msdos)
-PREFIX = d
-else
 PREFIX =
-endif
-
-ifdef DEBUG
-NAME = $(PREFIX)$(TARGET)$(SUFFIX)d
-else
-ifdef ATHLON
-NAME = $(PREFIX)$(TARGET)$(SUFFIX)at
-ARCH = -march=athlon
-else
-ifdef K6
-NAME = $(PREFIX)$(TARGET)$(SUFFIX)k6
-ARCH = -march=k6
-else
-ifdef I686
-NAME = $(PREFIX)$(TARGET)$(SUFFIX)pp
-ARCH = -march=pentiumpro
-else
-ifdef P4
-NAME = $(PREFIX)$(TARGET)$(SUFFIX)p4
-ARCH = -march=pentium4
-else
-NAME = $(PREFIX)$(TARGET)$(SUFFIX)
-ARCH = -march=pentium
-endif
-endif
-endif
-endif
-endif
 
 # build the targets in different object dirs, since mess changes
 # some structures and thus they can't be linked against each other.
@@ -101,9 +28,6 @@ DEFS = -DX86_ASM -DLSB_FIRST -DINLINE="static __inline__" -Dasm=__asm__
 
 CFLAGS = -std=gnu99 -Isrc -Isrc/includes -Isrc/$(MAMEOS) -I$(OBJ)/cpu/m68000 -Isrc/cpu/m68000
 
-ifdef SYMBOLS
-CFLAGS += -O0 -Wall -Wno-unused -g
-else
 CFLAGS += -DNDEBUG \
 	$(ARCH) -O3 -fomit-frame-pointer -fstrict-aliasing \
 	-Wall -Wno-sign-compare -Wunused \
@@ -111,49 +35,20 @@ CFLAGS += -DNDEBUG \
 	-Wshadow -Wstrict-prototypes -Wundef \
 	-Wformat-security -Wwrite-strings \
 	-Wdisabled-optimization \
-#	-Wredundant-decls
-#	-Wfloat-equal
-#	-Wunreachable-code -Wpadded
-#	-W had to remove because of the "missing initializer" warning
-#	-Wlarger-than-262144  \
-#	-Wcast-qual \
-#	-Wwrite-strings \
-#	-Wconversion \
-#	-Wmissing-prototypes \
-#	-Wmissing-declarations
-endif
 
 CFLAGSPEDANTIC = $(CFLAGS) -pedantic
 
-ifdef SYMBOLS
-LDFLAGS =
-else
-#LDFLAGS = -s -Wl,--warn-common
 LDFLAGS = -s
-endif
 
-ifdef MAP
-MAPFLAGS = -Wl,-M >$(NAME).map
-else
 MAPFLAGS =
-endif
 
 # platform .mak files will want to add to this
 LIBS = -lz
 
 OBJDIRS = obj obj/gcc $(OBJ) $(OBJ)/cpu $(OBJ)/sound $(OBJ)/$(MAMEOS) \
 	$(OBJ)/machine $(OBJ)/vidhrdw
-ifneq ($(TARGET),pinmame)
 OBJDIRS += $(OBJ)/drivers $(OBJ)/sndhrdw
-endif
-ifdef MESS
-OBJDIRS += $(OBJ)/mess $(OBJ)/mess/systems $(OBJ)/mess/machine \
-	$(OBJ)/mess/vidhrdw $(OBJ)/mess/sndhrdw $(OBJ)/mess/tools
-endif
 
-ifeq ($(TARGET),mmsnd)
-OBJDIRS	+= $(OBJ)/mmsnd $(OBJ)/mmsnd/machine $(OBJ)/mmsnd/drivers $(OBJ)/mmsnd/sndhrdw
-endif
 
 all:	maketree $(EMULATOR) extra
 
@@ -163,21 +58,9 @@ include src/$(TARGET).mak
 include src/rules.mak
 include src/$(MAMEOS)/$(MAMEOS).mak
 
-ifdef DEBUG
-DBGDEFS = -DMAME_DEBUG
-else
 DBGDEFS =
 DBGOBJS =
-endif
 
-ifdef TEST_NEW_SOUND
-DBGDEFS += -DTEST_NEW_SOUND
-endif
-
-ifdef COMPILESYSTEM_CYGWIN
-CFLAGS	+= -mno-cygwin
-LDFLAGS	+= -mno-cygwin
-endif
 
 extra:	$(TOOLS) $(TEXTS)
 
@@ -202,13 +85,6 @@ hdcomp$(EXE): $(OBJ)/hdcomp.o $(OBJ)/harddisk.o $(OBJ)/md5.o
 xml2info$(EXE): src/xml2info/xml2info.c
 	@echo Compiling $@...
 	$(CC) -O1 -o xml2info$(EXE) $<
-
-ifdef PERL
-$(OBJ)/cpuintrf.o: src/cpuintrf.c rules.mak
-	$(PERL) src/makelist.pl
-	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGSPEDANTIC) -c $< -o $@
-endif
 
 # for Windows at least, we can't compile OS-specific code with -pedantic
 $(OBJ)/$(MAMEOS)/%.o: src/$(MAMEOS)/%.c

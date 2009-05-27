@@ -1,0 +1,1 @@
+OSOBJS = $(OBJ)/ruby/fileio.o $(OBJ)/ruby/rc.o

@@ -1,14 +1,13 @@
 //============================================================
 //
-//	fileio.c - Win32 file access functions
+//	fileio.c - Cross platform file io functions
 //
 //============================================================
 
-// standard windows headers
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include <stdio.h>
 #include <ctype.h>
-#include <tchar.h>
+#include <wchar.h>
+typedef	wchar_t	TCHAR;
 
 // MAME headers
 #include "driver.h"
@@ -68,12 +67,12 @@ struct pathdata
 
 struct _osd_file
 {
-	HANDLE		handle;
+	FILE		handle;
 	UINT64		filepos;
 	UINT64		end;
 	UINT64		offset;
 	UINT64		bufferbase;
-	DWORD		bufferbytes;
+	UINT32		bufferbytes;
 	UINT8		buffer[FILE_BUFFER_SIZE];
 };
 
@@ -140,13 +139,11 @@ INLINE int is_pathsep(TCHAR c)
 
 static TCHAR *find_reverse_path_sep(TCHAR *name)
 {
-	TCHAR *p = name + _tcslen(name) - 1;
+	TCHAR *p = name + wcslen(name) - 1;
 	while (p >= name && !is_pathsep(*p))
 		p--;
 	return (p >= name) ? p : NULL;
 }
-
-
 
 //============================================================
 //	create_path
@@ -155,7 +152,7 @@ static TCHAR *find_reverse_path_sep(TCHAR *name)
 static void create_path(TCHAR *path, int has_filename)
 {
 	TCHAR *sep = find_reverse_path_sep(path);
-	DWORD attributes;
+	UINT32 attributes;
 
 	/* if there's still a separator, and it's not the root, nuke it and recurse */
 	if (sep && sep > path && !is_pathsep(sep[-1]))
