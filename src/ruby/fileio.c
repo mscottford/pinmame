@@ -53,6 +53,9 @@ extern const char *mameinfo_filename;
 extern char *cheatfile;
 
 
+#define DWORD UINT16
+#define LONG UINT32
+#define NO_ERROR 0
 
 //============================================================
 //	TYPE DEFINITIONS
@@ -149,6 +152,8 @@ static TCHAR *find_reverse_path_sep(TCHAR *name)
 //	create_path
 //============================================================
 
+// TODO: Replace with cross platform version
+// This method is currently borken
 static void create_path(TCHAR *path, int has_filename)
 {
 	TCHAR *sep = find_reverse_path_sep(path);
@@ -167,12 +172,12 @@ static void create_path(TCHAR *path, int has_filename)
 		return;
 
 	/* if the path already exists, we're done */
-	attributes = GetFileAttributes(path);
+//	attributes = GetFileAttributes(path);
 	if (attributes != INVALID_FILE_ATTRIBUTES)
 		return;
 
 	/* create the path */
-	CreateDirectory(path, NULL);
+//	CreateDirectory(path, NULL);
 }
 
 
@@ -446,6 +451,8 @@ int osd_get_path_info(int pathtype, int pathindex, const char *filename)
 //	osd_fopen
 //============================================================
 
+// TODO: Replace with cross platform version
+// This method is currently borken
 osd_file *osd_fopen(int pathtype, int pathindex, const char *filename, const char *mode)
 {
 	DWORD disposition = 0, access = 0, sharemode = 0;
@@ -477,22 +484,22 @@ osd_file *osd_fopen(int pathtype, int pathindex, const char *filename, const cha
 	compose_path(fullpath, pathtype, pathindex, filename);
 
 	/* attempt to open the file */
-	file->handle = CreateFile(fullpath, access, sharemode, NULL, disposition, 0, NULL);
-	if (file->handle == INVALID_HANDLE_VALUE)
+	//file->handle = CreateFile(fullpath, access, sharemode, NULL, disposition, 0, NULL);
+	//if (file->handle == 0 /*INVALID_HANDLE_VALUE*/)
 	{
-		DWORD error = GetLastError();
+		DWORD error = 0;//GetLastError();
 
 		/* if it's read-only, or if the path exists, then that's final */
-		if (!(access & GENERIC_WRITE) || error != ERROR_PATH_NOT_FOUND)
-			return NULL;
+		//if (!(access & GENERIC_WRITE) || error != ERROR_PATH_NOT_FOUND)
+		//	return NULL;
 
 		/* create the path and try again */
 		create_path(fullpath, 1);
-		file->handle = CreateFile(fullpath, access, sharemode, NULL, disposition, 0, NULL);
+		//file->handle = CreateFile(fullpath, access, sharemode, NULL, disposition, 0, NULL);
 
 		/* if that doesn't work, we give up */
-		if (file->handle == INVALID_HANDLE_VALUE)
-			return NULL;
+		//if (file->handle == INVALID_HANDLE_VALUE)
+		//	return NULL;
 	}
 
 	/* get the file size */
@@ -548,6 +555,8 @@ int osd_feof(osd_file *file)
 //	osd_fread
 //============================================================
 
+// TODO: Replace with cross platform version
+// This method is currently borken
 UINT32 osd_fread(osd_file *file, void *buffer, UINT32 length)
 {
 	UINT32 bytes_left = length;
@@ -577,8 +586,8 @@ UINT32 osd_fread(osd_file *file, void *buffer, UINT32 length)
 	if (file->offset != file->filepos)
 	{
 		LONG upperPos = file->offset >> 32;
-		result = SetFilePointer(file->handle, (UINT32)file->offset, &upperPos, FILE_BEGIN);
-		if (result == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR)
+		//result = SetFilePointer(file->handle, (UINT32)file->offset, &upperPos, FILE_BEGIN);
+		if (1 /*result == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR*/)
 		{
 			file->filepos = ~0;
 			return length - bytes_left;
@@ -592,7 +601,7 @@ UINT32 osd_fread(osd_file *file, void *buffer, UINT32 length)
 		// read as much of the buffer as we can
 		file->bufferbase = file->offset;
 		file->bufferbytes = 0;
-		ReadFile(file->handle, file->buffer, FILE_BUFFER_SIZE, &file->bufferbytes, NULL);
+		//ReadFile(file->handle, file->buffer, FILE_BUFFER_SIZE, &file->bufferbytes, NULL);
 		file->filepos += file->bufferbytes;
 
 		// copy it out
@@ -611,7 +620,7 @@ UINT32 osd_fread(osd_file *file, void *buffer, UINT32 length)
 	else
 	{
 		// do the read
-		ReadFile(file->handle, buffer, bytes_left, &result, NULL);
+		//ReadFile(file->handle, buffer, bytes_left, &result, NULL);
 		file->filepos += result;
 
 		// adjust the pointers and return
@@ -627,6 +636,8 @@ UINT32 osd_fread(osd_file *file, void *buffer, UINT32 length)
 //	osd_fwrite
 //============================================================
 
+// TODO: Replace with cross platform version
+// This method is currently borken
 UINT32 osd_fwrite(osd_file *file, const void *buffer, UINT32 length)
 {
 	LONG upperPos;
@@ -637,12 +648,12 @@ UINT32 osd_fwrite(osd_file *file, const void *buffer, UINT32 length)
 
 	// attempt to seek to the current location
 	upperPos = file->offset >> 32;
-	result = SetFilePointer(file->handle, (UINT32)file->offset, &upperPos, FILE_BEGIN);
+//	result = SetFilePointer(file->handle, (UINT32)file->offset, &upperPos, FILE_BEGIN);
 	if (result == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR)
 		return 0;
 
 	// do the write
-	WriteFile(file->handle, buffer, length, &result, NULL);
+//	WriteFile(file->handle, buffer, length, &result, NULL);
 	file->filepos += result;
 
 	// adjust the pointers
@@ -658,11 +669,13 @@ UINT32 osd_fwrite(osd_file *file, const void *buffer, UINT32 length)
 //	osd_fclose
 //============================================================
 
+// TODO: Replace with cross platform version
+// This method is currently borken
 void osd_fclose(osd_file *file)
 {
 	// close the handle and clear it out
 	if (file->handle)
-		CloseHandle(file->handle);
+//		CloseHandle(file->handle);
 	file->handle = NULL;
 }
 
