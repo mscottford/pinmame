@@ -1,5 +1,6 @@
 TARGET = pinmame
 MAMEOS = ruby
+NAME = pinmame
 
 # extension for executables
 EXE = .exe
@@ -50,7 +51,7 @@ OBJDIRS = obj obj/gcc $(OBJ) $(OBJ)/cpu $(OBJ)/sound $(OBJ)/$(MAMEOS) \
 OBJDIRS += $(OBJ)/drivers $(OBJ)/sndhrdw
 
 
-all:	maketree $(EMULATOR) extra
+all:	maketree $(EMULATOR)
 
 # include the various .mak files
 include src/core.mak
@@ -61,8 +62,6 @@ include src/$(MAMEOS)/$(MAMEOS).mak
 DBGDEFS =
 DBGOBJS =
 
-
-extra:	$(TOOLS) $(TEXTS)
 
 # combine the various definitions to one
 CDEFS = $(DEFS) $(COREDEFS) $(CPUDEFS) $(SOUNDDEFS) $(ASMDEFS) $(DBGDEFS)

@@ -12,7 +12,7 @@
  * Sigh.  This sort of thing is always nasty do deal with.  Note that
  * the version here does not include floating point...
  *
- * snprintf() is used instead of sprintf() as it does limit checks
+ * _snprintf() is used instead of sprintf() as it does limit checks
  * for string length.  This covers a nasty loophole.
  *
  * The other functions are there to prevent NULL pointers from
@@ -33,17 +33,17 @@
  *    which showed it, so that's been fixed.  Also, formated the code
  *    to mutt conventions, and removed dead code left over from the
  *    original.  Also, there is now a builtin-test, just compile with:
- *           gcc -DTEST_SNPRINTF -o snprintf snprintf.c -lm
- *    and run snprintf for results.
+ *           gcc -DTEST__snprintf -o _snprintf _snprintf.c -lm
+ *    and run _snprintf for results.
  *
  *  Thomas Roessler <roessler@guug.de> 01/27/98 for mutt 0.89i
  *    The PGP code was using unsigned hexadecimal formats.
  *    Unfortunately, unsigned formats simply didn't work.
  *
  *  Michael Elkins <me@cs.hmc.edu> 03/05/98 for mutt 0.90.8
- *    The original code assumed that both snprintf() and vsnprintf() were
- *    missing.  Some systems only have snprintf() but not vsnprintf(), so
- *    the code is now broken down under HAVE_SNPRINTF and HAVE_VSNPRINTF.
+ *    The original code assumed that both _snprintf() and _vsnprintf() were
+ *    missing.  Some systems only have snprintf() but not _vsnprintf(), so
+ *    the code is now broken down under HAVE_SNPRINTF and HAVE__vsnprintf.
  *
  *  Andrew Tridgell (tridge@samba.org) Oct 1998
  *    fixed handling of %.0f
@@ -62,7 +62,7 @@
 #include <ctype.h>
 #include <sys/types.h>
 
-#if !defined(HAVE_SNPRINTF) || !defined(HAVE_VSNPRINTF)
+#if !defined(HAVE__snprintf) || !defined(HAVE__vsnprintf)
 
 
 /* Define this as a fall through, HAVE_STDARG_H is probably already set */
@@ -97,8 +97,8 @@
 #define LDOUBLE double
 #endif
 
-int snprintf (char *str, size_t count, const char *fmt, ...);
-int vsnprintf (char *str, size_t count, const char *fmt, va_list arg);
+int _snprintf (char *str, size_t count, const char *fmt, ...);
+int _vsnprintf (char *str, size_t count, const char *fmt, va_list arg);
 
 static void dopr (char *buffer, size_t maxlen, const char *format,
                   va_list args);
@@ -711,21 +711,21 @@ static void dopr_outch (char *buffer, size_t *currlen, size_t maxlen, char c)
     buffer[(*currlen)++] = c;
 }
 
-#ifndef HAVE_VSNPRINTF
-int vsnprintf (char *str, size_t count, const char *fmt, va_list args)
+#ifndef HAVE__vsnprintf
+int _vsnprintf (char *str, size_t count, const char *fmt, va_list args)
 {
   str[0] = 0;
   dopr(str, count, fmt, args);
   return(strlen(str));
 }
-#endif /* !HAVE_VSNPRINTF */
+#endif /* !HAVE__vsnprintf */
 
 #ifndef HAVE_SNPRINTF
 /* VARARGS3 */
 #ifdef HAVE_STDARGS
-int snprintf (char *str,size_t count,const char *fmt,...)
+int _snprintf (char *str,size_t count,const char *fmt,...)
 #else
-int snprintf (va_alist) va_dcl
+int _snprintf (va_alist) va_dcl
 #endif
 {
 #ifndef HAVE_STDARGS
@@ -739,11 +739,11 @@ int snprintf (va_alist) va_dcl
   VA_SHIFT (str, char *);
   VA_SHIFT (count, size_t );
   VA_SHIFT (fmt, char *);
-  (void) vsnprintf(str, count, fmt, ap);
+  (void) _vsnprintf(str, count, fmt, ap);
   VA_END;
   return(strlen(str));
 }
-#endif /* !HAVE_SNPRINTF */
+#endif /* !HAVE__snprintf */
 
 #ifdef TEST_SNPRINTF
 #ifndef LONG_STRING
@@ -793,11 +793,11 @@ int main (void)
   for (x = 0; fp_fmt[x] != NULL ; x++)
     for (y = 0; fp_nums[y] != 0 ; y++)
     {
-      snprintf (buf1, sizeof (buf1), fp_fmt[x], fp_nums[y]);
+      _snprintf (buf1, sizeof (buf1), fp_fmt[x], fp_nums[y]);
       sprintf (buf2, fp_fmt[x], fp_nums[y]);
       if (strcmp (buf1, buf2))
       {
-	printf("snprintf doesn't match Format: %s\n\tsnprintf = %s\n\tsprintf  = %s\n",
+	printf("_snprintf doesn't match Format: %s\n\t_snprintf = %s\n\tsprintf  = %s\n",
 	    fp_fmt[x], buf1, buf2);
 	fail++;
       }
@@ -807,11 +807,11 @@ int main (void)
   for (x = 0; int_fmt[x] != NULL ; x++)
     for (y = 0; int_nums[y] != 0 ; y++)
     {
-      snprintf (buf1, sizeof (buf1), int_fmt[x], int_nums[y]);
+      _snprintf (buf1, sizeof (buf1), int_fmt[x], int_nums[y]);
       sprintf (buf2, int_fmt[x], int_nums[y]);
       if (strcmp (buf1, buf2))
       {
-	printf("snprintf doesn't match Format: %s\n\tsnprintf = %s\n\tsprintf  = %s\n",
+	printf("_snprintf doesn't match Format: %s\n\t_snprintf = %s\n\tsprintf  = %s\n",
 	    int_fmt[x], buf1, buf2);
 	fail++;
       }
@@ -819,8 +819,8 @@ int main (void)
     }
   printf ("%d tests failed out of %d.\n", fail, num);
 }
-#endif /* SNPRINTF_TEST */
+#endif /* _snprintf_TEST */
 
-#endif /* !HAVE_SNPRINTF */
+#endif /* !HAVE__snprintf */
 
 
