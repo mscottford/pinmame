@@ -60,6 +60,8 @@ int osd_get_path_info(int pathtype, int pathindex, const char *filename)
 //	osd_fopen
 //============================================================
 
+// TODO: Replace with cross platform version
+// This method is currently borken
 osd_file *osd_fopen(int pathtype, int pathindex, const char *filename, const char *mode)
 {
 	return NULL;
@@ -103,6 +105,8 @@ int osd_feof(osd_file *file)
 //	osd_fread
 //============================================================
 
+// TODO: Replace with cross platform version
+// This method is currently borken
 UINT32 osd_fread(osd_file *file, void *buffer, UINT32 length)
 {
 	return 0;
@@ -114,6 +118,8 @@ UINT32 osd_fread(osd_file *file, void *buffer, UINT32 length)
 //	osd_fwrite
 //============================================================
 
+// TODO: Replace with cross platform version
+// This method is currently borken
 UINT32 osd_fwrite(osd_file *file, const void *buffer, UINT32 length)
 {
 	return 0;
@@ -125,6 +131,8 @@ UINT32 osd_fwrite(osd_file *file, const void *buffer, UINT32 length)
 //	osd_fclose
 //============================================================
 
+// TODO: Replace with cross platform version
+// This method is currently borken
 void osd_fclose(osd_file *file)
 {
 }
