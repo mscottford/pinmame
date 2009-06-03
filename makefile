@@ -2,8 +2,21 @@ TARGET = pinmame
 MAMEOS = ruby
 NAME = pinmame
 
+# figure out the platform we are building on
+OS = $(shell uname -s | tr '[:upper:]' '[:lower:]')
+CPU = $(shell uname -m | sed -e 's/i[345678]86/i386/')
+MODEL = 32 # Default to 32bit compiles
+PLATFORM = $(CPU)-$(OS)
+
 # extension for executables
 EXE = .exe
+
+# Set defaults to unix (linux/solaris/bsd)
+PREFIX = lib
+LIBEXT = so
+LIBNAME = $(PREFIX)$(NAME).$(LIBEXT)
+
+export MACOSX_DEPLOYMENT_TARGET=10.4
 
 # CPU core include paths
 VPATH=src $(wildcard src/cpu/*)
@@ -17,31 +30,94 @@ ASMFLAGS = -f coff
 MD = -mkdir
 RM = @rm -f
 
-PREFIX =
+JFLAGS = -fno-omit-frame-pointer -fno-strict-aliasing
+OFLAGS = -O2 $(JFLAGS)
+WFLAGS = -W -Wall -Wno-unused -Wno-parentheses
+PICFLAGS = -fPIC
+SOFLAGS = -shared -mimpure-text -Wl,-O1
+LDFLAGS += $(SOFLAGS)
+
+CFLAGS = $(OFLAGS) $(WFLAGS) $(PICFLAGS) -D_REENTRANT
+
+ifeq ($(OS), win32)
+	CC += -mno-cygwin
+	LDFLAGS += -mno-cygwin -Wl,--add-stdcall-alias
+endif
+ifeq ($(OS), darwin)
+  ARCHFLAGS = -arch ppc
+  ifeq ($(CPU),i386)
+    ARCHFLAGS += -arch i386 -arch x86_64
+  endif
+  CFLAGS += $(ARCHFLAGS) -isysroot /Developer/SDKs/MacOSX10.4u.sdk -DTARGET_RT_MAC_CFM=0
+  CFLAGS += -fno-common
+  LDFLAGS = $(ARCHFLAGS) -dynamiclib -Wl,-syslibroot,$(SDKROOT) -mmacosx-version-min=10.4
+  # link against the universal libraries on ppc machines
+  LDFLAGS += -L/Developer/SDKs/MacOSX10.4u.sdk/usr/lib
+  LIBEXT = dylib
+  FFI_CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk
+  PICFLAGS =
+  SOFLAGS =
+endif
+
+ifeq ($(OS), linux)
+  SOFLAGS += -Wl,-soname,$(LIBNAME)
+endif
+
+ifeq ($(OS), solaris)
+  CC = /usr/sfw/bin/gcc -std=c99
+  LD = /usr/ccs/bin/ld
+  SOFLAGS = -shared -static-libgcc 
+endif
+
+ifeq ($(OS), aix)
+  LIBEXT = a
+  SOFLAGS = -shared -static-libgcc
+  PICFLAGS += -pthread
+endif
+
+ifneq ($(findstring cygwin, $(OS)),)
+  CFLAGS += -mno-cygwin -mwin32
+  LIBEXT = dll
+  PICFLAGS=
+endif
+ifneq ($(findstring mingw, $(OS)),)
+  LIBEXT = dll
+  PICFLAGS=
+endif
+ifeq ($(CPU), sparcv9)
+  MODEL = 64
+endif
+
+ifeq ($(CPU), amd64)
+  MODEL = 64
+endif
+
+ifeq ($(CPU), x86_64)
+  MODEL = 64
+endif
+
+# On platforms (linux, solaris) that support both 32bit and 64bit, force building for one or the other
+ifneq ($(or $(findstring linux, $(OS)), $(findstring solaris, $(OS))),)
+  # Change the CC/LD instead of CFLAGS/LDFLAGS, incase other things in the flags
+  # makes the libffi build choke
+  CC += -m$(MODEL)
+  LD += -m$(MODEL)
+endif
+
 
 # build the targets in different object dirs, since mess changes
 # some structures and thus they can't be linked against each other.
 OBJ = obj/gcc/$(NAME)
 
-EMULATOR = $(NAME)$(EXE)
+EMULATOR = $(LIBNAME)
 
 DEFS = -DX86_ASM -DLSB_FIRST -DINLINE="static __inline__" -Dasm=__asm__
 
-CFLAGS = -std=gnu99 -Isrc -Isrc/includes -Isrc/$(MAMEOS) -I$(OBJ)/cpu/m68000 -Isrc/cpu/m68000
+CFLAGS += -std=gnu99 -Isrc -Isrc/includes -Isrc/$(MAMEOS) -I$(OBJ)/cpu/m68000 -Isrc/cpu/m68000
 
-CFLAGS += -DNDEBUG \
-	$(ARCH) -O3 -fomit-frame-pointer -fstrict-aliasing \
-	-Wall -Wno-sign-compare -Wunused \
-	-Wpointer-arith -Wbad-function-cast -Wcast-align -Waggregate-return \
-	-Wshadow -Wstrict-prototypes -Wundef \
-	-Wformat-security -Wwrite-strings \
-	-Wdisabled-optimization \
+
 
 CFLAGSPEDANTIC = $(CFLAGS) -pedantic
-
-LDFLAGS = -s
-
-MAPFLAGS =
 
 # platform .mak files will want to add to this
 LIBS = -lz
@@ -71,8 +147,8 @@ $(EMULATOR): $(OBJS) $(COREOBJS) $(OSOBJS) $(DRVLIBS)
 # always recompile the version string
 	$(CC) $(CDEFS) $(CFLAGS) -c src/version.c -o $(OBJ)/version.o
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $(OBJS) $(COREOBJS) $(OSOBJS) $(LIBS) $(DRVLIBS) -o $@ $(MAPFLAGS)
-
+	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(COREOBJS) $(OSOBJS) $(DRVLIBS) -lm
+	
 romcmp$(EXE): $(OBJ)/romcmp.o $(OBJ)/unzip.o
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ -lz -o $@
@@ -83,7 +159,7 @@ hdcomp$(EXE): $(OBJ)/hdcomp.o $(OBJ)/harddisk.o $(OBJ)/md5.o
 
 xml2info$(EXE): src/xml2info/xml2info.c
 	@echo Compiling $@...
-	$(CC) -O1 -o xml2info$(EXE) $<
+	$(CC) $(CDEFS) $(CFLAGS) -O1 -o xml2info$(EXE) $<
 
 # for Windows at least, we can't compile OS-specific code with -pedantic
 $(OBJ)/$(MAMEOS)/%.o: src/$(MAMEOS)/%.c
@@ -92,12 +168,12 @@ $(OBJ)/$(MAMEOS)/%.o: src/$(MAMEOS)/%.c
 
 $(OBJ)/%.o: src/%.c
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGSPEDANTIC) -c $< -o $@
+	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
 
 # compile generated C files for the 68000 emulator
 $(M68000_GENERATED_OBJS): $(OBJ)/cpu/m68000/m68kmake$(EXE)
 	@echo Compiling $(subst .o,.c,$@)...
-	$(CC) $(CDEFS) $(CFLAGSPEDANTIC) -c $*.c -o $@
+	$(CC) $(CDEFS) $(CFLAGS) -c $*.c -o $@
 
 # additional rule, because m68kcpu.c includes the generated m68kops.h :-/
 $(OBJ)/cpu/m68000/m68kcpu.o: $(OBJ)/cpu/m68000/m68kmake$(EXE)
@@ -105,20 +181,20 @@ $(OBJ)/cpu/m68000/m68kcpu.o: $(OBJ)/cpu/m68000/m68kmake$(EXE)
 # generate C source files for the 68000 emulator
 $(OBJ)/cpu/m68000/m68kmake$(EXE): src/cpu/m68000/m68kmake.c
 	@echo M68K make $<...
-	$(CC) $(CDEFS) $(CFLAGSPEDANTIC) -DDOS -o $(OBJ)/cpu/m68000/m68kmake$(EXE) $<
+	$(CC) $(CDEFS) $(CFLAGS) -DDOS -o $(OBJ)/cpu/m68000/m68kmake$(EXE) $<
 	@echo Generating M68K source files...
 	$(OBJ)/cpu/m68000/m68kmake$(EXE) $(OBJ)/cpu/m68000 src/cpu/m68000/m68k_in.c
 
 # generate asm source files for the 68000/68020 emulators
 $(OBJ)/cpu/m68000/68000.asm:  src/cpu/m68000/make68k.c
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGSPEDANTIC) -O0 -DDOS -o $(OBJ)/cpu/m68000/make68k$(EXE) $<
+	$(CC) $(CDEFS) $(CFLAGS) -O0 -DDOS -o $(OBJ)/cpu/m68000/make68k$(EXE) $<
 	@echo Generating $@...
 	@$(OBJ)/cpu/m68000/make68k$(EXE) $@ $(OBJ)/cpu/m68000/68000tab.asm 00
 
 $(OBJ)/cpu/m68000/68020.asm:  src/cpu/m68000/make68k.c
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGSPEDANTIC) -O0 -DDOS -o $(OBJ)/cpu/m68000/make68k$(EXE) $<
+	$(CC) $(CDEFS) $(CFLAGS) -O0 -DDOS -o $(OBJ)/cpu/m68000/make68k$(EXE) $<
 	@echo Generating $@...
 	@$(OBJ)/cpu/m68000/make68k$(EXE) $@ $(OBJ)/cpu/m68000/68020tab.asm 20
 

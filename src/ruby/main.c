@@ -11,5 +11,5 @@ void osd_exit(void)
 
 int main(void) 
 {
-	return 0;
+	
 }
