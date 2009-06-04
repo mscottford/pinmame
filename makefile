@@ -71,7 +71,7 @@ ifeq ($(OS), aix)
 endif
 
 ifneq ($(findstring cygwin, $(OS)),)
-  CFLAGS += -mno-cygwin -mwin32
+  CFLAGS += 
   LIBEXT = dll
   PICFLAGS=
 endif
