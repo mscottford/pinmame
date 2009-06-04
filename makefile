@@ -30,26 +30,21 @@ ASMFLAGS = -f coff
 MD = -mkdir
 RM = @rm -f
 
-JFLAGS = -fno-omit-frame-pointer -fno-strict-aliasing
-OFLAGS = -O2 $(JFLAGS)
 WFLAGS = -W -Wall -Wno-unused -Wno-parentheses
 PICFLAGS = -fPIC
 SOFLAGS = -shared -mimpure-text -Wl,-O1
 LDFLAGS += $(SOFLAGS)
 
-CFLAGS = $(OFLAGS) $(WFLAGS) $(PICFLAGS) -D_REENTRANT
+CFLAGS = $(WFLAGS) $(PICFLAGS) -D_REENTRANT
 
 ifeq ($(OS), win32)
 	CC += -mno-cygwin
 	LDFLAGS += -mno-cygwin -Wl,--add-stdcall-alias
 endif
 ifeq ($(OS), darwin)
-  ARCHFLAGS = -arch ppc
-  ifeq ($(CPU),i386)
-    ARCHFLAGS += -arch i386 -arch x86_64
-  endif
+  ARCHFLAGS = -arch i386
   CFLAGS += $(ARCHFLAGS) -isysroot /Developer/SDKs/MacOSX10.4u.sdk -DTARGET_RT_MAC_CFM=0
-  CFLAGS += -fno-common
+  CFLAGS += 
   LDFLAGS = $(ARCHFLAGS) -dynamiclib -Wl,-syslibroot,$(SDKROOT) -mmacosx-version-min=10.4
   # link against the universal libraries on ppc machines
   LDFLAGS += -L/Developer/SDKs/MacOSX10.4u.sdk/usr/lib
@@ -147,7 +142,7 @@ $(EMULATOR): $(OBJS) $(COREOBJS) $(OSOBJS) $(DRVLIBS)
 # always recompile the version string
 	$(CC) $(CDEFS) $(CFLAGS) -c src/version.c -o $(OBJ)/version.o
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(COREOBJS) $(OSOBJS) $(DRVLIBS) -lm
+	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(COREOBJS) $(OSOBJS) $(DRVLIBS) $(LIBS) -lm
 	
 romcmp$(EXE): $(OBJ)/romcmp.o $(OBJ)/unzip.o
 	@echo Linking $@...
