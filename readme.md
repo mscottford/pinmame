@@ -26,9 +26,12 @@ After you have run `make` and with [Ruby FFI](http://kenai.com/projects/ruby-ffi
 
 Grab a copy of [Cygwin](http://www.cygwin.com). Make sure that you select the following packages for installation.
 
-* libffi
-* ruby
-* gcc
+*Under 'Devel'
+** ruby
+** gcc
+*Under 'Lib'
+** libffi
+*Under 'Mingw'
 * mingw-libz
 
 With this much installed you should be able to run `make` in the root of the directory. This will build `libpinmame.dll`. But you won't be able to use [Ruby FFI](http://kenai.com/projects/ruby-ffi) to make calls into the library. Since this is how most future work will be developed, you need to get your ruby environment up and running.
