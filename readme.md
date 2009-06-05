@@ -4,6 +4,15 @@
 
 ### Mac OS X (Intel only)
 
+#### Getting the source
+
+1. Install [git for Mac OS X](http://code.google.com/p/git-osx-installer/).
+2. Grab the source
+  * **For the curious**: To just get a plain copy of the source, you need to run `git clone git://github.com/mscottford/pinmame.git`. 
+
+  * **For contributors**: If you want to contribute, then you need to fork the project first with your github account. You will then need to run the `git clone <your clone url>`.
+
+
 #### Install Developer Tools (XCode)
 
 If you don't already have it, then you need to install the Developer Tools that are packaged on your Mac OS X disc. You can also [download the latest version](http://developer.apple.com/technology/xcode.html).
@@ -27,14 +36,24 @@ After you have run `make` and with [Ruby FFI](http://kenai.com/projects/ruby-ffi
 Grab a copy of [Cygwin](http://www.cygwin.com). Make sure that you select the following packages for installation.
 
 * Under `Devel`
-  * ruby
   * gcc
+  * git (needed to get the source)
+  * make
+  * ruby
 * Under `Lib`
   * libffi
 * Under `Mingw`
   * mingw-libz
+  
+#### Getting the source
 
-With this much installed you should be able to run `make` in the root of the directory. This will build `libpinmame.dll`. But you won't be able to use [Ruby FFI](http://kenai.com/projects/ruby-ffi) to make calls into the library. Since this is how most future work will be developed, you need to get your ruby environment up and running.
+* **For the curious**: To just get a plain copy of the source, you need to run `git clone git://github.com/mscottford/pinmame.git`. 
+
+* **For contributors**: If you want to contribute, then you need to fork the project first with your github account. You will then need to run the `git clone <your clone url>`.
+  
+#### Building the project
+
+With this much installed and the source downloaded, you should be able to run `make` in the root of the directory. This will build `libpinmame.dll`. But you won't be able to use [Ruby FFI](http://kenai.com/projects/ruby-ffi) to make calls into the library. Since this is how most future work will be developed, you need to get your ruby environment up and running.
 
 #### Configuring Ruby
  
