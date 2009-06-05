@@ -8,9 +8,10 @@
 
 1. Install [git for Mac OS X](http://code.google.com/p/git-osx-installer/).
 2. Grab the source
-  * **For the curious**: To just get a plain copy of the source, you need to run `git clone git://github.com/mscottford/pinmame.git`. 
 
-  * **For contributors**: If you want to contribute, then you need to fork the project first with your github account. You will then need to run the `git clone <your clone url>`.
+    * **For the curious**: To just get a plain copy of the source, you need to run `git clone git://github.com/mscottford/pinmame.git`. 
+
+    * **For contributors**: If you want to contribute, then you need to fork the project first with your github account. You will then need to run the `git clone <your clone url>`.
 
 
 #### Install Developer Tools (XCode)
