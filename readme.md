@@ -2,6 +2,24 @@
 
 ## Building
 
+### Mac OS X (Intel only)
+
+#### Install Developer Tools (XCode)
+
+If you don't already have it, then you need to install the Developer Tools that are packaged on your Mac OS X disc. You can also [download the latest version](http://developer.apple.com/technology/xcode.html).
+
+You should now be able to run `make` in the root of the pinmame directory.
+
+#### Install Ruby FFI Gem
+
+1. Run `gem update --system` to make sure that you are using the latest version of [RubyGems](http://rubygems.org).
+2. Run `gem install rake` to make sure that you have rake installed.
+3. Run `gem install ffi`.
+
+#### Testing the setup
+
+After you have run `make` and with [Ruby FFI](http://kenai.com/projects/ruby-ffi) installed, you can test your configuration by running `ruby test.rb`. If you see a `0` on the next line then you are all set.
+
 ### Windows
 
 #### Installing dependencies
