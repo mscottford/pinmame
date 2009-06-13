@@ -1,0 +1,5 @@
+require File.dirname(__FILE__) + '/pinmame/rectangle.rb'
+require File.dirname(__FILE__) + '/pinmame/region_info.rb'
+require File.dirname(__FILE__) + '/pinmame/running_machine.rb'
+require File.dirname(__FILE__) + '/pinmame/game_driver.rb'
+require File.dirname(__FILE__) + '/pinmame/globals.rb'
