@@ -1,1 +1,1 @@
-OSOBJS = $(OBJ)/ruby/fileio.o $(OBJ)/ruby/rc.o $(OBJ)/ruby/input.o $(OBJ)/ruby/sound.o $(OBJ)/ruby/video.o $(OBJ)/ruby/ticker.o $(OBJ)/ruby/misc.o $(OBJ)/ruby/main.o $(OBJ)/ruby/tile.o $(OBJ)/ruby/snprintf.o
+OSOBJS = $(OBJ)/ruby/fileio.o $(OBJ)/ruby/rc.o $(OBJ)/ruby/input.o $(OBJ)/ruby/sound.o $(OBJ)/ruby/video.o $(OBJ)/ruby/ticker.o $(OBJ)/ruby/misc.o $(OBJ)/ruby/main.o $(OBJ)/ruby/tile.o $(OBJ)/ruby/snprintf.o $(OBJ)/ruby/driver_info.o
